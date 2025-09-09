@@ -1,8 +1,8 @@
-# Your startup name here
+# CollabRoom
 
 [My Notes](notes.md)
 
-A brief description of the application here. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
 
 
 > [!NOTE]
@@ -18,45 +18,38 @@ A brief description of the application here. Lorem ipsum dolor sit amet, consect
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] Proper use of Markdown
-- [ ] A concise and compelling elevator pitch
-- [ ] Description of key features
-- [ ] Description of how you will use each technology
-- [ ] One or more rough sketches of your application. Images must be embedded in this file using Markdown image references.
+- [x] Proper use of Markdown
+- [x] A concise and compelling elevator pitch
+- [x] Description of key features
+- [x] Description of how you will use each technology
+- [x] One or more rough sketches of your application. Images must be embedded in this file using Markdown image references.
 
 ### Elevator pitch
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+An application that allows students to create study/project groups _quickly_ and _easily_. __Only__ the host of a "group" will need to have an account to use this platform. After a group/room is created a code can be shared that allows other students to join __without creating an account__, this design choice reduces the friction there is in starting a project. 
 
 ### Design
 
-![Design image](placeholder.png)
+![Image showing a potential users flow through the project](projectIdea.jpg)
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-```mermaid
-sequenceDiagram
-    actor You
-    actor Website
-    You->>Website: Replace this with your design
-```
 
 ### Key features
 
-- Describe your key feature
-- Describe your key feature
-- Describe your key feature
+- Ability to Sign in/ Sign up
+    - Ability, when signed in to create groups
+    - Ability to keep groups saved between sessions
+- Group rooms that can be joined/ accessed to communicate with classmates
+    - Ability to join rooms _without_ an account using an access code
 
 ### Technologies
 
 I am going to use the required technologies in the following ways.
 
-- **HTML** - Description here
-- **CSS** - Description here
-- **React** - Description here
-- **Service** - Description here
-- **DB/Login** - Description here
-- **WebSocket** - Description here
+- **HTML** - To render chat rooms, login page, and other pages/sections that will allow the user to navigate the app
+- **CSS** - To make buttons more interactive and improve the look of the pages.
+- **React** - To allow me to make the website more reactive to user inputs and allow for webhooks
+- **Service** - Authentication endpoints, chat services, 3rd party image calls to give each group a unique image without having to store images
+- **DB/Login** - Stores log ins, and chat histories and who is connected to each room
+- **WebSocket** - Allows for real time communication in the chat rooms
 
 ## 🚀 AWS deliverable
 
