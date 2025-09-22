@@ -9,17 +9,28 @@
 <body>
     <header>
         <h1>Login Page</h1>
-        <a href="./index.html">Home</a>
-        <a href="./login.html">Login</a>
-        <a href="./join_group.html">Home</a>
-        <a href="./index.html">Home</a>
-
+        <nav>
+            <menu>
+                <li><a href="./index.html">Home</a></li>
+                <li><a href="./login.html">Login</a></li>
+                <li><a href="./join_group.html">Join Group</a></li>
+            </menu>
+        </nav>
     </header>
-    <div id="login">
-        <form id="login-form">
-            <input class="login" id="username" type="text" required placeholder="username"/>
-            <input class="login" id="password" type="password" required placeholder="password"/>
-            <button id="login-submit" class="login">Submit</button>
+
+    <div id="login" class="form-format">
+        <form id="login-form" class="form-format">
+            <input class="form-input-format" id="username" type="text" required placeholder="username"/>
+            <input class="form-input-format" id="password" type="password" required placeholder="password"/>
+            <button id="login-submit" class="login">Log in</button>
+        </form>
+    </div>
+
+    <div id="new-account" class="form-format">
+        <form id="login-form" class="form-format">
+            <input class="form-input-format" id="new-username" type="text" required placeholder="username"/>
+            <input class="form-input-format" id="new-password" type="password" required placeholder="password"/>
+            <button id="new-account-submit" class="login">Create Account</button>
         </form>
     </div>
 

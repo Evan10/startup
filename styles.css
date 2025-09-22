@@ -9,14 +9,14 @@ html, body {
     border:0;
 }
 
-div#login{
+div.form-format{
     width: 30%;
     height: 50%;
     margin-left: 35%;
     margin-top:15%;
 }
 
-#login-form{
+form.form-format{
     width:90%;
     height:90%;
     display: flex;
@@ -26,7 +26,7 @@ div#login{
     margin: 5%;
 }
 
-.login{
+.form-input-format{
     width: 100%;
     height: 20%;
 }
