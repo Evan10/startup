@@ -30,3 +30,42 @@ form.form-format{
     width: 100%;
     height: 20%;
 }
+
+#chat-container{
+    margin-right: 10%;
+    margin-left: 10%;
+    display: flex;
+    flex-direction: column;
+}
+
+#message-container{
+    display: flex;
+    flex-direction: column;
+}
+
+.message{
+    width:70%;
+    margin: 1rem;
+    padding:1rem;
+}
+
+.from-other{
+    background-color: greenyellow;
+    border-radius: 2rem 2rem 2rem 0rem;
+}
+
+.from-me{
+    background-color: lightblue;
+    margin-left: auto;
+    border-radius: 2rem 2rem 0rem 2rem;
+}
+
+.rounded-corners{
+    border-radius: 1rem;
+}
+
+#message-input-container{
+    display:flex;
+    flex-direction: row;
+    justify-content:space-evenly ;
+}
