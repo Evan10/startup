@@ -55,21 +55,21 @@ I am going to use the required technologies in the following ways.
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [X] **Server deployed and accessible with custom domain name** - [My server link](https://yourdomainnamehere.click).
+- [X] **Server deployed and accessible with custom domain name** - [My server link](https://workcircle.click).
 
 ## 🚀 HTML deliverable
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] **HTML pages** - I did not complete this part of the deliverable.
-- [ ] **Proper HTML element usage** - I did not complete this part of the deliverable.
-- [ ] **Links** - I did not complete this part of the deliverable.
-- [ ] **Text** - I did not complete this part of the deliverable.
-- [ ] **3rd party API placeholder** - I did not complete this part of the deliverable.
-- [ ] **Images** - I did not complete this part of the deliverable.
-- [ ] **Login placeholder** - I did not complete this part of the deliverable.
-- [ ] **DB data placeholder** - I did not complete this part of the deliverable.
-- [ ] **WebSocket placeholder** - I did not complete this part of the deliverable.
+- [X] **HTML pages** - I created the html pages
+- [X] **Proper HTML element usage** - I used divs and forms to properly partition my elements
+- [X] **Links** - I added links to interconnect the different pages
+- [X] **Text** - I added text to the html pages
+- [X] **3rd party API placeholder** - I did not complete this part of the deliverable.
+- [X] **Images** - I added an image to the start page
+- [X] **Login placeholder** - I added a placholder login page
+- [X] **DB data placeholder** - I added placeholder messages for the group chat
+- [X] **WebSocket placeholder** - Again I added placeholder message for the group chat which will be updated real time
 
 ## 🚀 CSS deliverable
 
