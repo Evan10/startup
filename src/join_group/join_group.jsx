@@ -1,7 +1,11 @@
 import React from 'react';
+import {useNavigate} from "react-router-dom"
+import "../app.css"
+
 
 export function JoinGroup() {
-    
+    const navigate = useNavigate();
+
         const handleFormSubmit = (e) =>{
             e.preventDefault();
             navigate("/chat");

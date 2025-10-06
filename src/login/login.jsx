@@ -1,11 +1,13 @@
 import React from 'react';
-import {navigate} from "react-router-dom"
+import {useNavigate} from "react-router-dom"
+import "../app.css"
 
 export function Login() {
+     const navigate = useNavigate();
 
     const handleFormSubmit = (e) =>{
         e.preventDefault();
-        navigate("/dashboard");
+        navigate("/");
     }
 
     return (

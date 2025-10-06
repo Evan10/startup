@@ -7,6 +7,7 @@ import { LandingPage } from './landing_page/landing_page';
 import { JoinGroup } from './join_group/join_group';
 import { Chat } from "./chat/chat"
 import { CreateGroup } from './create_group/create_group';
+import "./app.css"
 
 export default function App() {
   return (
