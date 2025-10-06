@@ -78,17 +78,17 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 - [X] **Header, footer, and main content body** - I used bootstrap and some css to format these elements
 - [X] **Navigation elements** - I used bootstrap to make it look nice
 - [X] **Responsive to window resizing** - I am using bootstrap to automatically resize elements properly
-- [X] **Application elements** - I centered them
+- [X] **Application elements** - I centered the elements and added spacing
 - [X] **Application text content** - I changed the font and resized some elements
-- [X] **Application images** - I made it fade in and out
+- [X] **Application images** - I used css to make the image fade in and out smoothly
 
 ## 🚀 React part 1: Routing deliverable
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [X] **Bundled using Vite** - I did not complete this part of the deliverable.
-- [X] **Components** - I did not complete this part of the deliverable.
-- [X] **Router** - I did not complete this part of the deliverable.
+- [X] **Bundled using Vite** - I downloaded and installed Vite and used it to build my components
+- [X] **Components** - I converted all the html to react components
+- [X] **Router** - I used the BrowserRouter to allow for instant updates to the page
 
 ## 🚀 React part 2: Reactivity deliverable
 
