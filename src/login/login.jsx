@@ -1,12 +1,19 @@
 import React from 'react';
+import {navigate} from "react-router-dom"
 
 export function Login() {
+
+    const handleFormSubmit = (e) =>{
+        e.preventDefault();
+        navigate("/dashboard");
+    }
+
     return (
         <main classNameName="container-fluid bg-secondary text-center">
             <div className="container col-12">
                 <div className="col-8 offset-2 card">
                     <div id="login" className=" card-body ">
-                        <form id="login-form" className="form-format">
+                        <form onSubmit={handleFormSubmit} id="login-form" className="form-format">
                             <div className="form-body d-flex flex-column align-items-center">
                                 <input className="row w-75" id="username" type="text" required placeholder="username" />
                                 <input className="row w-75" id="password" type="password" required placeholder="password" />
@@ -18,7 +25,7 @@ export function Login() {
 
                 <div className="col-8 offset-2 card">
                     <div id="new-account" className="justify-content-center card-body ">
-                        <form id="login-form" className="form-format">
+                        <form onSubmit={handleFormSubmit} id="login-form" className="form-format">
                             <div className="form-body d-flex flex-column align-items-center">
                                 <input className="row w-75" id="new-username" type="text" required placeholder="username" />
                                 <input className="row w-75" id="new-password" type="password" required placeholder="password" />

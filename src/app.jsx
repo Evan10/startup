@@ -5,6 +5,8 @@ import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
 import { Login } from './login/login';
 import { LandingPage } from './landing_page/landing_page';
 import { JoinGroup } from './join_group/join_group';
+import { Chat } from "./chat/chat"
+import { CreateGroup } from './create_group/create_group';
 
 export default function App() {
   return (
@@ -25,6 +27,8 @@ export default function App() {
         <Route path='/' element={<LandingPage />} exact />
         <Route path='/login' element={<Login />} />
         <Route path='/join_group' element={<JoinGroup />} />
+        <Route path='/create_group' element={<CreateGroup/>} />
+        <Route path='/chat' element={<Chat/>}/>
         <Route path='*' element={<NotFound />} />
       </Routes>
 
