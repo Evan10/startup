@@ -1,9 +1,9 @@
 import React from 'react';
 
-export function JoinGroup() {
+export function Login() {
   return (
     <main className="container-fluid bg-secondary text-center">
-      <div>Join Group displayed here</div>
+      <div>login displayed here</div>
     </main>
   );
 }
