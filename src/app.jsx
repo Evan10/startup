@@ -37,7 +37,7 @@ export default function App() {
             <hr/>
                 <p>Author Name:</p>
             <hr/>
-            <p><a href="https://github.com/Evan10">Evan Royal</a></p>
+            <p><a href="https://github.com/Evan10/startup">Evan Royal</a></p>
         </footer>
     </div>
      </BrowserRouter>
