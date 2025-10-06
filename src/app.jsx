@@ -6,6 +6,8 @@ import { Login } from './login/login';
 import { Play } from './play/play';
 import { Scores } from './scores/scores';
 import { About } from './about/about';
+import { LandingPage } from './landing_page/landing_page';
+import { JoinGroup } from './join_group/join_group';
 
 export default function App() {
   return (
@@ -22,15 +24,26 @@ export default function App() {
             </nav>
         </header>
 
-      <main>App components go here</main>
+      <Routes>
+        <Route path='/' element={<LandingPage />} exact />
+        <Route path='/login' element={<Login />} />
+        <Route path='/join_group' element={<JoinGroup />} />
+        <Route path='*' element={<NotFound />} />
+      </Routes>
 
-      <footer>
-        <hr/>
-            <p>Author Name:</p>
-        <hr/>
-        <p><a href="https://github.com/Evan10">Evan Royal</a></p>
-    </footer>
+        <footer>
+            <hr/>
+                <p>Author Name:</p>
+            <hr/>
+            <p><a href="https://github.com/Evan10">Evan Royal</a></p>
+        </footer>
     </div>
      </BrowserRouter>
   );
+}
+
+
+
+function NotFound() {
+  return <main className="container-fluid bg-secondary text-center">404: Return to sender. Address unknown.</main>;
 }
