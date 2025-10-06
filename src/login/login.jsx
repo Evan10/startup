@@ -17,7 +17,7 @@ export function Login() {
                             <div className="form-body d-flex flex-column align-items-center">
                                 <input className="row w-75" id="username" type="text" required placeholder="username" />
                                 <input className="row w-75" id="password" type="password" required placeholder="password" />
-                                <button id="login-submit" className="row">Log in</button>
+                                <button id="login-submit" type="submit" className="row">Log in</button>
                             </div>
                         </form>
                     </div>
@@ -29,7 +29,7 @@ export function Login() {
                             <div className="form-body d-flex flex-column align-items-center">
                                 <input className="row w-75" id="new-username" type="text" required placeholder="username" />
                                 <input className="row w-75" id="new-password" type="password" required placeholder="password" />
-                                <button id="new-account-submit" className="row">Create Account</button>
+                                <button id="new-account-submit" type="submit" className="row">Create Account</button>
                             </div>
                         </form>
                     </div>
