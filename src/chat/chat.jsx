@@ -6,10 +6,10 @@ export function Chat() {
     <main classNameName="container-fluid bg-secondary text-center">
       <div id="chat-container">
         <div id="message-container">
-            <div className="message from-other"><p>Did you decide on the format for the title page yet?</p></div>
-            <div className="message from-me"><p>Yes, give me a second to grab the link</p></div>
-            <div className="message from-me"><p>fakelink.com/fake?fakelinkdata=123123</p></div>
-            <div className="message from-other"><p>Awesome looks great!</p></div>
+          <Message text="Did you decide on the format for the title page yet?" />
+          <Message text="Yes, give me a second to grab the link" />
+          <Message text="fakelink.com/fake?fakelinkdata=123123" />
+          <Message text="Awesome looks great!" />
         </div>
         <hr/>
         <div id="message-input-container">
