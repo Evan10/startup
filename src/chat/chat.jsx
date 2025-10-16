@@ -6,10 +6,10 @@ export function Chat() {
     <main classNameName="container-fluid bg-secondary text-center">
       <div id="chat-container">
         <div id="message-container">
-          <Message text="Did you decide on the format for the title page yet?" />
-          <Message text="Yes, give me a second to grab the link" />
-          <Message text="fakelink.com/fake?fakelinkdata=123123" />
-          <Message text="Awesome looks great!" />
+          <Message fromUser={false} text={"Did you decide on the format for the title page yet?"} />
+          <Message fromUser={true} text={"Yes, give me a second to grab the link"} />
+          <Message fromUser={false} text={"fakelink.com/fake?fakelinkdata=123123"} />
+          <Message fromUser={true} text={"Awesome looks great!"} />
         </div>
         <hr/>
         <div id="message-input-container">

@@ -8,7 +8,6 @@ export function CreateGroup() {
     const handleFormSubmit = (e) => {
         e.preventDefault();
         navigate("/chat");
-
     }
 
   return (

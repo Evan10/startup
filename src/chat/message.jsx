@@ -1,6 +1,10 @@
 
 import "../app.css"
 
-export function Message({text}){
-    return (<div className="message from-other"><p>{message}</p></div>);
+export function Message({ text, fromUser, state }) {
+    classAtribs = "message " + fromUser ? "from-me" : "from-other"
+
+    return (<div>
+                <div className={classAtribs}><p>{text}</p></div>
+            </div>);
 }
