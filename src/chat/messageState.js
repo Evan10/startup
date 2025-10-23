@@ -1,4 +1,4 @@
-export class messageState {
+export default class messageState {
   static Sending = new messageState('sending');
   static Delivered = new messageState('delivered');
   static Seen = new messageState('seen');

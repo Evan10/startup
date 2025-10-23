@@ -1,5 +1,6 @@
 
 import "../app.css"
+import messageState from "./messageState"
 
 export function Message({ text, fromUser, state }) {
     classAtribs = "message " + fromUser ? "from-me" : "from-other"
