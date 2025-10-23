@@ -33,11 +33,12 @@ export default function App() {
         <Route path='*' element={<NotFound />} />
       </Routes>
       </main>
-        <footer>
+        <footer className='d-flex flex-column justify-content-start'>
             <hr/>
+            <div className="d-flex flex-row justify-content-between">
                 <p>Author Name:</p>
-            <hr/>
             <p><a href="https://github.com/Evan10/startup">Evan Royal</a></p>
+            </div>
         </footer>
     </div>
      </BrowserRouter>

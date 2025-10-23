@@ -6,22 +6,20 @@
     margin: 10px 0 0 20px;
     font-size: 40px;
 }
-html {
+
+.body {
     margin: 0;
     padding:0;
     border:0;
-    height: 100%;
-}
-
-.body {
     display: flex;
     flex-direction: column;
-    height: 100vh; 
+    height: 100vh;
+    overflow: hidden;
 }
 
 main {
     flex:1;
-    overflow: hidden;
+    overflow: auto;
     display: flex;
     flex-direction: column;
 }
@@ -38,4 +36,11 @@ main {
 .fade-to-white{
     mask-image: linear-gradient(to bottom, rgb(255, 255, 255,0),rgba(255,255,255,.2),rgba(255,255,255,1), rgba(255,255,255,.2), rgba(255,255,255,0));
     
+}
+
+footer{
+    height:40px;
+    padding: .5rem;
+    font-size: 0.9rem;
+    flex-shrink: 0;
 }
