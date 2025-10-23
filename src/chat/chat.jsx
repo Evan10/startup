@@ -36,7 +36,7 @@ export function Chat({ user, chatId }) {
           {
             messages.length === 0 ? (<p>Loading...</p>) :
               (messages.map((p, i) => {
-                <Message id={i} state={message.state} fromUser={p.user == user} text={p.text} />
+                <Message id={i} state={p.state} fromUser={p.user == user} text={p.text} />
               }))
           }
         </div>
