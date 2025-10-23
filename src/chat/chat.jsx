@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import "../app.css"
 import { UserInput } from './userInput';
+import {Message} from './message';
 import messageState from "./messageState"
 
 export function Chat({ user, chatId }) {
-  [messages, updateMessages] = useState({});
-  [title, updateTitle] = useState("Title Loading...");
+  const [messages, updateMessages] = useState([]);
+  const [title, updateTitle] = useState("Title Loading...");
   useEffect(() => {
     const tempMessageData = [{
       user: "123",
@@ -29,13 +30,13 @@ export function Chat({ user, chatId }) {
   }, []);
 
   return (
-    <main classNameName="container-fluid bg-secondary text-center">
+    <main className="container-fluid bg-secondary text-center">
       <div id="chat-container">
         <div id="message-container">
           {
-            JSON.stringify(messages) === "{}" ? (<p>Loading...</p>) :
-              (messages.map((p) => {
-                <Message state={message.state} fromUser={p.user == user} text={p.text} />
+            messages.length === 0 ? (<p>Loading...</p>) :
+              (messages.map((p, i) => {
+                <Message id={i} state={message.state} fromUser={p.user == user} text={p.text} />
               }))
           }
         </div>

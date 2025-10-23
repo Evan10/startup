@@ -29,7 +29,7 @@ export default function App() {
         <Route path='/login' element={<Login />} />
         <Route path='/join_group' element={<JoinGroup />} />
         <Route path='/create_group' element={<CreateGroup/>} />
-        <Route path='/chat' element={<Chat/>}/>
+        <Route path='/chat' element={<Chat user="123" chatId="123456789"/>}/>
         <Route path='*' element={<NotFound />} />
       </Routes>
 
