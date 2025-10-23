@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import "../app.css"
 import { UserInput } from './userInput';
-import {Message} from './message';
+import { Message } from './message';
 import messageState from "./messageState"
 
 export function Chat({ user, chatId }) {
@@ -29,15 +29,19 @@ export function Chat({ user, chatId }) {
 
   }, []);
 
+  useEffect(() => {
+    console.log("Messages updated:", messages);
+  }, [messages]);
+
   return (
     <main className="container-fluid bg-secondary text-center">
       <div id="chat-container">
         <div id="message-container">
           {
             messages.length === 0 ? (<p>Loading...</p>) :
-              (messages.map((p, i) => {
-                <Message id={i} state={p.state} fromUser={p.user == user} text={p.text} />
-              }))
+              (messages.map((p, i) => (
+                <Message key={i} state={p.state} fromUser={p.user == user} text={p.text} />
+              )))
           }
         </div>
         <hr />
