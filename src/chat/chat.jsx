@@ -11,27 +11,41 @@ export function Chat({ user, chatId }) {
     const tempMessageData = [{
       user: "123",
       text: "This is a text message",
-      state: messageState.Seen
+      state: messageState.Seen,
+      id: crypto.randomUUID()
     }, {
       user: "321",
       text: "This is another text message",
-      state: messageState.Seen
+      state: messageState.Seen,
+      id: crypto.randomUUID()
     }, {
       user: "123",
       text: "testing",
-      state: messageState.Delivered
+      state: messageState.Delivered,
+      id: crypto.randomUUID()
     }, {
       user: "123",
       text: "This is yet another message",
-      state: messageState.Sending
+      state: messageState.Sending,
+      id: crypto.randomUUID()
     }]
     updateMessages(tempMessageData);
-
   }, []);
 
   useEffect(() => {
     console.log("Messages updated:", messages);
   }, [messages]);
+
+  let i = 0;
+  setInterval(()=>{
+    updateMessages(...messages + {
+      user: "123",
+      text: `This is test number ${++i}`,
+      state: messageState.Sending,
+      id: crypto.randomUUID()
+    })
+  },5000);//simulate recieving messages
+
 
   return (
     <main className="container-fluid bg-secondary text-center">
@@ -39,8 +53,8 @@ export function Chat({ user, chatId }) {
         <div id="message-container">
           {
             messages.length === 0 ? (<p>Loading...</p>) :
-              (messages.map((p, i) => (
-                <Message key={i} state={p.state} fromUser={p.user == user} text={p.text} />
+              (messages.map((p) => (
+                <Message key={p.id} state={p.state} fromUser={p.user == user} text={p.text} />
               )))
           }
         </div>
