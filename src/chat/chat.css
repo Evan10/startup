@@ -24,6 +24,11 @@
 }
 
 .message{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
     width:70%;
     margin: 1rem;
     padding:1rem;
@@ -38,4 +43,19 @@
     background-color: lightblue;
     margin-left: auto;
     border-radius: 2rem 2rem 0rem 2rem;
+}
+
+.msg-user{
+    align-self: flex-start;
+    margin: 0;
+}
+
+.msg-text{
+    align-self: flex-start;
+    margin: 4px 0;
+}
+.msg-state{
+    align-self: flex-end;
+    justify-self: flex-end;
+
 }
