@@ -12,7 +12,7 @@ import "./app.css"
 export default function App() {
   return (
     <BrowserRouter>
-    <div className="body bg-dark text-light">
+    <div className="body">
       <header>
         <h1 id="Title">WorkCircle</h1>
             <nav className="d-flex justify-content-center py-3">
