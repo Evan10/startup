@@ -11,7 +11,7 @@ export function Login() {
     }
 
     return (
-        <main className="container-fluid bg-secondary text-center">
+        <div className="container-fluid text-center">
             <div className="container col-12">
                 <div className="col-8 offset-2 card">
                     <div id="login" className=" card-body ">
@@ -37,6 +37,6 @@ export function Login() {
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
     );
 }

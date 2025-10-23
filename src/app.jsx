@@ -34,7 +34,7 @@ export default function App() {
       </Routes>
       </main>
         <footer className='d-flex flex-column justify-content-start'>
-            <hr/>
+            <hr className="m-0" />
             <div className="d-flex flex-row justify-content-between">
                 <p>Author Name:</p>
             <p><a href="https://github.com/Evan10/startup">Evan Royal</a></p>

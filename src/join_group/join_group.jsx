@@ -12,7 +12,7 @@ export function JoinGroup() {
         }
 
     return (
-        <main className="container-fluid bg-secondary text-center">
+        <div className="container-fluid text-center">
 
             <div className="col-8 offset-2 card">
                 <div id="join-group-form" className=" card-body ">
@@ -25,6 +25,6 @@ export function JoinGroup() {
                     </form>
                 </div>
             </div>
-        </main>
+        </div>
     );
 }

@@ -56,7 +56,7 @@ export function Chat({ user, chatId }) {
 
 
   return (
-    <main className="container-fluid bg-secondary text-center">
+    <div className="container-fluid text-center">
       <div id="chat-container">
         <div id="message-container">
           {
@@ -69,6 +69,6 @@ export function Chat({ user, chatId }) {
         <hr />
         <UserInput />
       </div>
-    </main>
+    </div>
   );
 }

@@ -11,13 +11,13 @@ export function CreateGroup() {
     }
 
   return (
-    <main className="container-fluid bg-secondary text-center">
+    <div className="container-fluid text-center">
     <div className="form-format">
         <form className="form-format" onSubmit={handleFormSubmit}> 
             <input className="form-input-format" type="text" required placeholder="Group Name"/>
             <button className="form-input-format" type="submit">Create Group</button>
         </form>
     </div>
-    </main>
+    </div>
   );
 }
