@@ -23,7 +23,7 @@ export default function App() {
                 </menu>
             </nav>
         </header>
-
+      <main>
       <Routes>
         <Route path='/' element={<LandingPage />} exact />
         <Route path='/login' element={<Login />} />
@@ -32,7 +32,7 @@ export default function App() {
         <Route path='/chat' element={<Chat user="123" chatId="123456789"/>}/>
         <Route path='*' element={<NotFound />} />
       </Routes>
-
+      </main>
         <footer>
             <hr/>
                 <p>Author Name:</p>

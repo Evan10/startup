@@ -3,17 +3,25 @@
 }
 
 #Title {
-    margin: 50px 0 0 50px;
-    font-size: 100px;
+    margin: 10px 0 0 20px;
+    font-size: 40px;
 }
-
-html, .body {
-    height: 100vh; 
+html {
     margin: 0;
     padding:0;
     border:0;
 }
 
+.body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; 
+}
+
+main {
+    flex:1;
+    overflow: hidden;
+}
 
 .rounded-corners{
     border-radius: 1rem;
