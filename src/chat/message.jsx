@@ -10,7 +10,7 @@ export function Message({ messageData, fromUser }) {
     return (<div>
                 <div className={classAtribs}>
                     <p className={"msg-user"}>{"From: " + messageData.user}</p>
-                    <p className={"msg-text"}>{messageData.text}</p>
+                    <p className={"msg-text"}>{messageData.content}</p>
                     <p className={"msg-state"}>{messageData.state.name}</p>
                     </div>
             </div>);

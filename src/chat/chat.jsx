@@ -3,6 +3,7 @@ import "../app.css"
 import "./chat.css"
 import { UserInput } from './userInput';
 import { Message } from './message';
+import { FileMessage } from "./fileMessage"
 import messageState from "./messageState"
 import { useParams,useNavigate } from 'react-router-dom';
 
@@ -29,14 +30,25 @@ export function Chat({ user, chatId }) {
     setInterval(() => {
       updateMessages((msgs) => {
         return [...msgs, {
+          type:"text",
           user: "321",
-          text: `This is a test`,
+          content: `This is a test`,
           state: messageState.Sending,
           id: crypto.randomUUID()
         }]
       }
       )
 
+      updateMessages((msgs) => {
+        return [...msgs, {
+          type:"file",
+          user: "321",
+          content: `thirdPartyURLStuff`,
+          state: messageState.Sending,
+          id: crypto.randomUUID()
+        }]
+      }
+      )
     }, 5000);//simulate recieving messages
 
   }, [chatID]);
@@ -49,7 +61,7 @@ export function Chat({ user, chatId }) {
   }, [messages]);
 
   const sendMessage = (msg) => {
-    const messageData = {text: msg, user: user, state:messageState.Sending, id:crypto.randomUUID()}
+    const messageData = {type:"text",content:msg, user: user, state:messageState.Sending, id:crypto.randomUUID()}
     updateMessages((msgs) => {
         return [...msgs, messageData]
       });
@@ -69,7 +81,9 @@ export function Chat({ user, chatId }) {
               {
                 !messages ? (<p>Loading...</p>) :
                   (messages.map((p) => (
-                    <Message key={p.id} messageData={p} fromUser={user == p.user} />
+                    p.type === "text" ?
+                    <Message key={p.id} messageData={p} fromUser={user == p.user} />:
+                    <FileMessage key={p.id} messageData={p} fromUser={user == p.user} />
                   )))
               }
               <div ref={endOfSectionRef}></div>

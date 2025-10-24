@@ -13,23 +13,27 @@ export function CreateGroup({user}) {
         const chatID = crypto.randomUUID();
 
         const tempMessageData = [{
+              type:"text",
               user: "123",
-              text: "This is a text message",
+              content: "This is a text message",
               state: messageState.Seen,
               id: crypto.randomUUID()
             }, {
+              type:"text",
               user: "321",
-              text: "This is another text message",
+              content: "This is another text message",
               state: messageState.Seen,
               id: crypto.randomUUID()
             }, {
+              type:"text",
               user: "123",
-              text: "testing",
+              content: "testing",
               state: messageState.Delivered,
               id: crypto.randomUUID()
             }, {
+              type:"text",
               user: "123",
-              text: "This is yet another message",
+              content: "This is yet another message",
               state: messageState.Sending,
               id: crypto.randomUUID()
             }]
