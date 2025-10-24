@@ -12,9 +12,15 @@ export function Login({updateUser, user}) {
         if(!formData.get("username") || !formData.get("password")){
             alert("Please fill out all required fields!");
             return;
-        }else{
-            localStorage.setItem("loginInfo",JSON.stringify({username:}))
         }
+            
+
+        const loginInfo = JSON.parse(localStorage.getItem("loginInfo"));
+        
+        if (loginInfo?.username == formData.get("username") && loginInfo?.password == formData.get("password")){
+            updateUser(formData.get("username"))
+        }
+
         navigate("/");
     }
 
@@ -25,9 +31,10 @@ export function Login({updateUser, user}) {
         if(!formData.get("username") || !formData.get("password") ){
             alert("Please fill out all required fields!");
             return;
-        }else{
-
         }
+
+        localStorage.setItem("loginInfo",JSON.stringify({username:formData.get("username"),password:formData.get("password")}))
+        updateUser(formData.get("username"))
 
         navigate("/");
     }
