@@ -94,8 +94,8 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] **All functionality implemented or mocked out** - I did not complete this part of the deliverable.
-- [ ] **Hooks** - I did not complete this part of the deliverable.
+- [X] **All functionality implemented or mocked out** - created Chat mock ups, file uploading, chat selection and storage, login, etc
+- [x] **Hooks** - I used hooks to create a reactive page and interactive experience
 
 ## 🚀 Service deliverable
 
