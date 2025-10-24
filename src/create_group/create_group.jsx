@@ -41,7 +41,7 @@ export function CreateGroup({user}) {
         
         const chats = JSON.parse(localStorage.getItem("Chats")) || {};
         
-        chats[chatID] = chatKey;
+        chats[chatID] = formData.get("groupName");
         localStorage.setItem("Chats", JSON.stringify(chats));
 
         navigate(`/chat/${chatID}`);

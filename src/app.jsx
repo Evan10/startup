@@ -12,8 +12,14 @@ import "./app.css"
 export default function App() {
 
   const [user, updateUser] = useState("");
+  const [chats, updateChats] = useState([]);
+
+  useEffect(()=>{
+
+    localStorage.getItem("Chats")
 
 
+  },[])
 
   return (
     <BrowserRouter>
@@ -25,6 +31,14 @@ export default function App() {
                     <li className="nav-item"><NavLink className="nav-link" to="">Home</NavLink></li>
                     <li className="nav-item"><NavLink className="nav-link" to="login">Login</NavLink></li>
                     <li className="nav-item"><NavLink className="nav-link" to="join_group">Join Group</NavLink></li>
+
+                    {user != null && (<li className="nav-item">
+                      <ul>
+                        {chats.map((c)=>{<li><NavLink className="nav-link" to={`/chat/${c.chatID}`}>{c.title}</NavLink></li>})}
+                         </ul>
+                      </li>)
+                      }
+                     
                 </menu>
             </nav>
         </header>

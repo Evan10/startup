@@ -65,7 +65,7 @@ export function Chat({ user, chatId }) {
               }
             </div>
           </div>
-        <UserInput className="position:fixed" onSend={sendMessage}/>
+        <UserInput onSend={sendMessage}/>
     </div>
   );
 }
