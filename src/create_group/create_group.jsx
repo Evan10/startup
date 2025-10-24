@@ -7,7 +7,40 @@ export function CreateGroup({user}) {
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
+        const formData = new FormData(e.target);
+        
         const chatID = crypto.randomUUID();
+
+        const tempMessageData = [{
+              user: "123",
+              text: "This is a text message",
+              state: messageState.Seen,
+              id: crypto.randomUUID()
+            }, {
+              user: "321",
+              text: "This is another text message",
+              state: messageState.Seen,
+              id: crypto.randomUUID()
+            }, {
+              user: "123",
+              text: "testing",
+              state: messageState.Delivered,
+              id: crypto.randomUUID()
+            }, {
+              user: "123",
+              text: "This is yet another message",
+              state: messageState.Sending,
+              id: crypto.randomUUID()
+            }]
+
+        const chatKey = "Chat:"+chatID;
+        const chatInfo = {title:formData.get("groupName"),messages:JSON.stringify(tempMessageData)}
+
+        localStorage.setItem(chatKey, chatInfo)
+        
+        const chats = JSON.parse(localStorage.getItem("Chats"));
+        chats.chatID = chatKey;
+        localStorage.setItem("Chats", JSON.stringify(chats));
 
         navigate(`/chat/${chatID}`);
     }

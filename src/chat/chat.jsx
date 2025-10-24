@@ -4,35 +4,21 @@ import "./chat.css"
 import { UserInput } from './userInput';
 import { Message } from './message';
 import messageState from "./messageState"
-import { useParams } from 'react-router-dom';
+import { useParams,useNavigate } from 'react-router-dom';
 
 export function Chat({ user, chatId }) {
   const [messages, updateMessages] = useState([]);
   const [title, updateTitle] = useState("Title Loading...");
   const {chatID} = useParams();
   useEffect(() => { 
-    const tempMessageData = [{
-      user: "123",
-      text: "This is a text message",
-      state: messageState.Seen,
-      id: crypto.randomUUID()
-    }, {
-      user: "321",
-      text: "This is another text message",
-      state: messageState.Seen,
-      id: crypto.randomUUID()
-    }, {
-      user: "123",
-      text: "testing",
-      state: messageState.Delivered,
-      id: crypto.randomUUID()
-    }, {
-      user: "123",
-      text: "This is yet another message",
-      state: messageState.Sending,
-      id: crypto.randomUUID()
-    }]
-    updateMessages(tempMessageData);
+    const chatAsString = localStorage.getItem(`Chat:${chatID}`);
+    if (!chatAsString){
+      alert("Chat not found");
+
+    }
+    const chat = JSON.parse(localStorage.getItem(`Chat:${chatID}`));
+    updateTitle(chat.title);
+    updateMessages(chat.tempMessageData);
 
     setInterval(() => {
       updateMessages((msgs) => {
@@ -50,7 +36,7 @@ export function Chat({ user, chatId }) {
   }, []);
 
   useEffect(() => {
-    console.log("Messages updated:", messages);
+    localStorage.setItem(`Chat:${chatID}`, );
   }, [messages]);
 
 
@@ -58,17 +44,16 @@ export function Chat({ user, chatId }) {
 
   return (
     <div className="container-fluid text-center">
-      <div id="chat-container">
-          <div id="message-container">
-            {
-              messages.length === 0 ? (<p>Loading...</p>) :
-                (messages.map((p) => (
-                  <Message key={p.id} messageData={p} fromUser={user == p.user} />
-                )))
-            }
+        <div id="chat-container">
+            <div id="message-container">
+              {
+                messages.length === 0 ? (<p>Loading...</p>) :
+                  (messages.map((p) => (
+                    <Message key={p.id} messageData={p} fromUser={user == p.user} />
+                  )))
+              }
+            </div>
           </div>
-        </div>
-        <hr />
         <UserInput />
     </div>
   );

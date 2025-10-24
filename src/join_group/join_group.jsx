@@ -8,7 +8,9 @@ export function JoinGroup() {
 
         const handleFormSubmit = (e) =>{
             e.preventDefault();
-            navigate("/chat");
+            const formData = new FormData(e.target);
+
+            navigate(`/chat/${formData.get("roomCode")}`);
         }
 
     return (
@@ -18,7 +20,7 @@ export function JoinGroup() {
                 <div id="join-group-form" className=" card-body ">
                     <form id="login-form" className="form-format" onSubmit={handleFormSubmit}>
                         <div className="form-body d-flex flex-column align-items-center">
-                            <input className="form-input-format" type="text" required placeholder="Enter Room Code" />
+                            <input className="form-input-format" name="roomCode" type="text" required placeholder="Enter Room Code" />
                             <input className="form-input-format" type="text" required placeholder="Choose a name" />
                             <button type="submit">Join Room</button>
                         </div>
