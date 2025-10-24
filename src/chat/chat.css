@@ -23,6 +23,10 @@
 }
 
 #message-input-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
@@ -30,6 +34,7 @@
     padding: 0.5rem;
     border-top: 1px solid #000000;
     background-color: white;
+    z-index: 100;
 }
 
 .from-other{

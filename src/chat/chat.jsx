@@ -19,11 +19,10 @@ export function Chat({ user, chatId }) {
       setTimeout(()=>{navigate("/")}, 3000);
       return;
     }
-    console.log(chatAsString)
     const chat = JSON.parse(chatAsString);
-    
+
     updateTitle(chat.title);
-    updateMessages(chat.tempMessageData);
+    updateMessages(chat.messages);
 
     setInterval(() => {
       updateMessages((msgs) => {
@@ -47,6 +46,13 @@ export function Chat({ user, chatId }) {
     localStorage.setItem(`Chat:${chatID}`, data);
   }, [messages]);
 
+  const sendMessage = (msg) => {
+    const messageData = {text: msg, user: user, state:messageState.Sending, id:crypto.randomUUID()}
+    updateMessages((msgs) => {
+        return [...msgs, messageData]
+      });
+  };
+
   return (
     <div className="container-fluid text-center">
         <div id="chat-container">
@@ -59,7 +65,7 @@ export function Chat({ user, chatId }) {
               }
             </div>
           </div>
-        <UserInput />
+        <UserInput className="position:fixed" onSend={sendMessage}/>
     </div>
   );
 }
