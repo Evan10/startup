@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import "../app.css"
 import "./chat.css"
 import { UserInput } from './userInput';
@@ -11,6 +11,8 @@ export function Chat({ user, chatId }) {
   const [title, updateTitle] = useState("Title Loading...");
   const {chatID} = useParams();
   const navigate = useNavigate();
+
+  const endOfSectionRef = useRef(null);
 
   useEffect(() => { 
     const chatAsString = localStorage.getItem(`Chat:${chatID}`);
@@ -37,7 +39,7 @@ export function Chat({ user, chatId }) {
 
     }, 5000);//simulate recieving messages
 
-  }, []);
+  }, [chatID]);
 
   useEffect(() => { 
     if(chatID == null)return;
@@ -51,7 +53,14 @@ export function Chat({ user, chatId }) {
     updateMessages((msgs) => {
         return [...msgs, messageData]
       });
+      
+      setTimeout(()=>{scrollToEnd()},50);
+
   };
+
+  const scrollToEnd = () => {
+    endOfSectionRef.current.scrollIntoView({behavior:"smooth"});
+  }
 
   return (
     <div className="container-fluid text-center">
@@ -63,6 +72,7 @@ export function Chat({ user, chatId }) {
                     <Message key={p.id} messageData={p} fromUser={user == p.user} />
                   )))
               }
+              <div ref={endOfSectionRef}></div>
             </div>
           </div>
         <UserInput onSend={sendMessage}/>

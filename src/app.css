@@ -17,6 +17,22 @@
     overflow: hidden;
 }
 
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  background: white;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  list-style: none;
+}
+
+.dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+
+
+
 main {
     flex:1;
     overflow: auto;
@@ -63,3 +79,4 @@ footer{
     font-size: 0.9rem;
     flex-shrink: 0;
 }
+

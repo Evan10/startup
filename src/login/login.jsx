@@ -30,7 +30,6 @@ export function Login({updateUser, user}) {
         const handleNewAccount= (e) =>{
         e.preventDefault();
         const formData = new FormData(e.target);
-        console.log(e)
         if(!formData.get("username") || !formData.get("password") ){
             alert("Please fill out all required fields!");
             return;

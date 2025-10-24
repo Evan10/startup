@@ -37,6 +37,14 @@
     z-index: 100;
 }
 
+#message-input-container input {
+  flex: 1;
+  margin-right: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 1rem;
+  border: 1px solid #ccc;
+}
+
 .from-other{
     background-color: greenyellow;
     border-radius: 2rem 2rem 2rem 0rem;

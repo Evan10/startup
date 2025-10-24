@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './app.css';
 import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
@@ -12,13 +12,17 @@ import "./app.css"
 export default function App() {
 
   const [user, updateUser] = useState("");
-  const [chats, updateChats] = useState([]);
+  const [AvailableChats, updateChats] = useState([]);
 
   useEffect(()=>{
 
-    localStorage.getItem("Chats")
+    const chats = JSON.parse(localStorage.getItem("Chats"));
+    if(!chats)return;
+    const chatObjs = Object.keys(chats).map((k)=>{
+      return {chatID:k,title:chats[k]}
+    });
 
-
+    updateChats(chatObjs);
   },[])
 
   return (
@@ -32,9 +36,10 @@ export default function App() {
                     <li className="nav-item"><NavLink className="nav-link" to="login">Login</NavLink></li>
                     <li className="nav-item"><NavLink className="nav-link" to="join_group">Join Group</NavLink></li>
 
-                    {user != null && (<li className="nav-item">
-                      <ul>
-                        {chats.map((c)=>{<li><NavLink className="nav-link" to={`/chat/${c.chatID}`}>{c.title}</NavLink></li>})}
+                    {user.length !== 0 && (<li className="nav-link nav-item dropdown">
+                      <span>Chats</span>
+                      <ul className='dropdown-menu'>
+                        {AvailableChats.map((c)=>{return <li><NavLink className=" dropdown-item" to={`/chat/${c.chatID}`}>{c.title}</NavLink></li>})}
                          </ul>
                       </li>)
                       }
