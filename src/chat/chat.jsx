@@ -4,12 +4,13 @@ import "./chat.css"
 import { UserInput } from './userInput';
 import { Message } from './message';
 import messageState from "./messageState"
+import { useParams } from 'react-router-dom';
 
 export function Chat({ user, chatId }) {
   const [messages, updateMessages] = useState([]);
   const [title, updateTitle] = useState("Title Loading...");
-
-  useEffect(() => {
+  const {chatID} = useParams();
+  useEffect(() => { 
     const tempMessageData = [{
       user: "123",
       text: "This is a text message",
@@ -58,17 +59,17 @@ export function Chat({ user, chatId }) {
   return (
     <div className="container-fluid text-center">
       <div id="chat-container">
-        <div id="message-container">
-          {
-            messages.length === 0 ? (<p>Loading...</p>) :
-              (messages.map((p) => (
-                <Message key={p.id} messageData={p} fromUser={user == p.user} />
-              )))
-          }
+          <div id="message-container">
+            {
+              messages.length === 0 ? (<p>Loading...</p>) :
+                (messages.map((p) => (
+                  <Message key={p.id} messageData={p} fromUser={user == p.user} />
+                )))
+            }
+          </div>
         </div>
         <hr />
         <UserInput />
-      </div>
     </div>
   );
 }
