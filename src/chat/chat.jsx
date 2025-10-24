@@ -65,10 +65,16 @@ export function Chat({ user, chatId }) {
     updateMessages((msgs) => {
         return [...msgs, messageData]
       });
-      
       setTimeout(()=>{scrollToEnd()},50);
-
   };
+
+  const sendFile = (flData) => {
+        const fileMessageData = {type:"file",content:flData, user: user, state:messageState.Sending, id:crypto.randomUUID()}
+    updateMessages((msgs) => {
+        return [...msgs, fileMessageData]
+      });
+      setTimeout(()=>{scrollToEnd()},50);
+  }
 
   const scrollToEnd = () => {
     endOfSectionRef.current.scrollIntoView({behavior:"smooth"});
@@ -89,7 +95,7 @@ export function Chat({ user, chatId }) {
               <div ref={endOfSectionRef}></div>
             </div>
           </div>
-        <UserInput onSend={sendMessage}/>
+        <UserInput onSendMessage={sendMessage} onFileSend={sendFile}/>
     </div>
   );
 }

@@ -4,7 +4,7 @@ import "../app.css"
 import messageState from "./messageState"
 import React, { useEffect, useState, useRef } from 'react';
 
-export function UserInput({onSend}) {
+export function UserInput({onSendMessage, onFileSend}) {
     const inputRef = useRef(null);  
     const fileSelectorRef = useRef(null);
     
@@ -12,7 +12,7 @@ export function UserInput({onSend}) {
     const handleSend = () => {
         const messageText = inputRef.current.value;
         if(messageText.trim() !== ""){
-            onSend(messageText);
+            onSendMessage(messageText);
             inputRef.current.value = "";
         }
 
@@ -29,7 +29,8 @@ export function UserInput({onSend}) {
 
 
     const handleSendFile = (e) => {
-
+        const file = e.target.files[0];
+        onFileSend(file.name);
     }
 
     return (
