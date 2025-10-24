@@ -10,13 +10,18 @@ export function Chat({ user, chatId }) {
   const [messages, updateMessages] = useState([]);
   const [title, updateTitle] = useState("Title Loading...");
   const {chatID} = useParams();
+  const navigate = useNavigate();
+
   useEffect(() => { 
     const chatAsString = localStorage.getItem(`Chat:${chatID}`);
     if (!chatAsString){
       alert("Chat not found");
-
+      setTimeout(()=>{navigate("/")}, 3000);
+      return;
     }
-    const chat = JSON.parse(localStorage.getItem(`Chat:${chatID}`));
+    console.log(chatAsString)
+    const chat = JSON.parse(chatAsString);
+    
     updateTitle(chat.title);
     updateMessages(chat.tempMessageData);
 
@@ -35,19 +40,19 @@ export function Chat({ user, chatId }) {
 
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem(`Chat:${chatID}`, );
+  useEffect(() => { 
+    if(chatID == null)return;
+
+    const data = JSON.stringify({title:title, messages:messages});
+    localStorage.setItem(`Chat:${chatID}`, data);
   }, [messages]);
-
-
-
 
   return (
     <div className="container-fluid text-center">
         <div id="chat-container">
             <div id="message-container">
               {
-                messages.length === 0 ? (<p>Loading...</p>) :
+                !messages ? (<p>Loading...</p>) :
                   (messages.map((p) => (
                     <Message key={p.id} messageData={p} fromUser={user == p.user} />
                   )))

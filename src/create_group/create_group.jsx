@@ -1,6 +1,7 @@
 import React from 'react';
 import {useNavigate} from "react-router-dom"
 import "../app.css"
+import messageState from '../chat/messageState';
 
 export function CreateGroup({user}) {
     const navigate = useNavigate();
@@ -34,12 +35,13 @@ export function CreateGroup({user}) {
             }]
 
         const chatKey = "Chat:"+chatID;
-        const chatInfo = {title:formData.get("groupName"),messages:JSON.stringify(tempMessageData)}
+        const chatInfo = JSON.stringify({title:formData.get("groupName"),messages:tempMessageData});
 
         localStorage.setItem(chatKey, chatInfo)
         
-        const chats = JSON.parse(localStorage.getItem("Chats"));
-        chats.chatID = chatKey;
+        const chats = JSON.parse(localStorage.getItem("Chats")) || {};
+        
+        chats[chatID] = chatKey;
         localStorage.setItem("Chats", JSON.stringify(chats));
 
         navigate(`/chat/${chatID}`);
