@@ -10,6 +10,11 @@ import { CreateGroup } from './create_group/create_group';
 import "./app.css"
 
 export default function App() {
+
+  const [user, updateUser] = useState("");
+
+
+
   return (
     <BrowserRouter>
     <div className="body">
@@ -25,11 +30,11 @@ export default function App() {
         </header>
       <main>
       <Routes>
-        <Route path='/' element={<LandingPage />} exact />
-        <Route path='/login' element={<Login />} />
-        <Route path='/join_group' element={<JoinGroup />} />
-        <Route path='/create_group' element={<CreateGroup/>} />
-        <Route path='/chat' element={<Chat user="123" chatId="123456789"/>}/>
+        <Route path='/' element={<LandingPage user={user}/>} exact />
+        <Route path='/login' element={<Login updateUser={updateUser} user={user} />} />
+        <Route path='/join_group' element={<JoinGroup user={user}/>} />
+        <Route path='/create_group' element={<CreateGroup user={user}/>} />
+        <Route path='/chat' element={<Chat user={user} chatId="123456789"/>}/>
         <Route path='*' element={<NotFound />} />
       </Routes>
       </main>
