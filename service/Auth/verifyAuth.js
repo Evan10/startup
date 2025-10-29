@@ -26,4 +26,8 @@ export default class verifyAuth{
     verifySessionToken(user, token){
         return this.sessionTokens[user] === token;
     }
+
+    endSession(user){
+        delete this.sessionTokens[user];
+    }
 }
