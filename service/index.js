@@ -19,6 +19,8 @@ app.use(express.static('public'));
 const APIRouter = express.Router();
 app.use("/api", APIRouter);
 
+
+
 APIRouter.post("/auth/create", (req, res)=>{
 
 });
