@@ -10,7 +10,7 @@ export default class testDB{
         this.credentials = credentials;
         this.users = [];
         this.chats = {};
-
+        this.joinCodes = [];
     }
 
     isUsernameAvailable(username){
@@ -34,15 +34,23 @@ export default class testDB{
 
 
     getJoinCodes(){
-        return {};    
+        return this.joinCodes;    
     }
 
-    createNewChat(chatName, chatID, user, join_code){
-        return false;
+    createNewChat(chatName, chatID, user, joinCode){
+        this.chats[chatID] = {owner:user, joinCode:joinCode, chatName:chatName, messages:[]};
+        this.joinCodes.push(joinCode);
+        return true;
     }
 
-    getChatData(username, chatID, startTime = null, endTime = null){
-        return {};
+    getChatWithID(chatID){
+        return this.chats[id];
+    }
+
+    getChatWithJoinCode(joinCode){
+        const id = Object.keys(this.chats).find((id) => this.chats[id].joinCode === joinCode);
+        if(!id){return undefined;}
+        return this.chats[id];
     }
 
     updateChatData(chatID, chatData){
