@@ -22,30 +22,46 @@ const APIRouter = express.Router();
 app.use("/api", APIRouter);
 
 const checkToken = (req, res, next) => {
-    const token = req.cookies[TOKEN_NAME], username = req.cookies[TOKEN_NAME];
-    if(!token){
-        res.status(401).send({message:"No token found"});
-    }else if(myAuthVerifier.verifySessionToken())
+    const token = req.cookies[TOKEN_NAME], username = req.cookies[USERNAME];
+    if(!token || !username){
+        res.status(401).send({message:"Missing credentials, try signing in again."});
+    }else if(!myAuthVerifier.verifySessionToken(username, token)){
+        res.status(401).send({message:"Incorrect token, try signing in again."});
+    }else{
+        next();
+    }
 
 }
 
 APIRouter.post("/auth/create", async (req, res)=>{
     const username = req.body?.username, password = req.body?.password;
-    if(!username || !password){ res.status(401).send({success:false, message:"Missing password or username"});
-}
+    if(!username || !password) res.status(401).send({success:false, message:"Missing password or username"});
+
     const pwhash = await bcrypt.hash(password);
     const success = myDatabase.createNewUser(username, pwhash);
 
     if (success){
         const token = myAuthVerifier.verifyCredentials(username, password);
-        res.send({success:true, sessionToken:token});
+        if(!token){
+            res.status(401).send({success:false,message:"Account was created but you weren't signed in"});
+        }else{
+            res.send({success:true, sessionToken:token});
+        }
     }else{
         res.status(401).send({success:false,message:"Account could not be created"});
     }
 });
 
 APIRouter.post("/auth/login", (req, res)=>{
-
+    const username = req.body?.username, password = req.body?.password;
+    if(!username || !password) res.status(401).send({success:false, message:"Missing password or username"});
+    
+    const token = myAuthVerifier.verifyCredentials(username, password);
+    if(!token){
+        res.status(401).send({success:false,message:"Incorrect username or password"});
+    }else{
+        res.send({success:true, sessionToken:token});
+    }
 
 });
 
