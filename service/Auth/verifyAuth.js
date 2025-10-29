@@ -12,12 +12,12 @@ export default class verifyAuth{
         if(!pwHash) return false;
         const isValid = await bcrypt.compare(password, pwHash);
         if(isValid){
-           return generateSessionToken(username);
+           return this.#generateSessionToken(username);
         }
         return false;
     }
 
-    generateSessionToken(user){
+    #generateSessionToken(user){
         const token = crypto.randomUUID();
         this.sessionTokens[user] = token;
         return token;
