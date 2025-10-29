@@ -55,7 +55,7 @@ APIRouter.post("/auth/create", async (req, res)=>{
 APIRouter.post("/auth/login", (req, res)=>{
     const username = req.body?.username, password = req.body?.password;
     if(!username || !password) res.status(401).send({success:false, message:"Missing password or username"});
-    
+
     const token = myAuthVerifier.verifyCredentials(username, password);
     if(!token){
         res.status(401).send({success:false,message:"Incorrect username or password"});
@@ -65,4 +65,11 @@ APIRouter.post("/auth/login", (req, res)=>{
 
 });
 
-APIRouter.delete("/auth/logout", (req, res)=>{});
+APIRouter.delete("/auth/logout", checkToken, (req, res)=>{
+    const username = req.cookies[USERNAME];
+    if(!username)res.status(401).send({message:"Couldn't find user."});
+
+    myAuthVerifier.endSession(username);
+    res.status(200).send({message:"User successfully signed out"});
+
+});
