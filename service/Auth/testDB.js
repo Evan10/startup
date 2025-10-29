@@ -54,11 +54,16 @@ export default class testDB{
     }
 
     updateChatData(chatID, chatData){
-        return false;
+        this.chats[chatID] = chatData;
+        return true;
     }
 
     deleteChat(username, chatID){
-        return false;
+        const chat = this.chats[chatID];
+        if (username !== chat.owner){
+            return false;
+        }
+        return delete this.chats[chatID]; // returns true if there was a chat to delete and false if it didnt exist
     }
 
 }
