@@ -14,12 +14,12 @@ export default class testDB{
     }
 
     isUsernameAvailable(username){
-        return !this.users.find((user) => user.username === username);
+        return !this.users.some((user) => user.username === username);
     }
 
     //return true when successfully created
     createNewUser(username, passwordHash){
-        if(!isUsernameAvailable(username)){
+        if(!this.isUsernameAvailable(username)){
             return false;
         }   
         this.users.push({username:username, passwordHash:passwordHash})
@@ -44,7 +44,7 @@ export default class testDB{
     }
 
     getChatWithID(chatID){
-        return this.chats[id];
+        return this.chats[chatID];
     }
 
     getChatWithJoinCode(joinCode){
@@ -60,10 +60,10 @@ export default class testDB{
 
     deleteChat(username, chatID){
         const chat = this.chats[chatID];
-        if (username !== chat.owner){
-            return false;
-        }
-        return delete this.chats[chatID]; // returns true if there was a chat to delete and false if it didnt exist
+        if (!chat) return false;
+        if (username !== chat.owner) return false;
+        delete this.chats[chatID];
+        return true;
     }
 
 }
