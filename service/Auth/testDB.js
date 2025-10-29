@@ -3,26 +3,32 @@
 
 
 
-export default class dbConnection{
-
+export default class testDB{
 
 
     constructor(credentials){
         this.credentials = credentials;
+        this.users = [];
+        this.chats = {};
+
     }
 
     isUsernameAvailable(username){
-        return false;
+        return !this.users.find((user) => user.username === username);
     }
 
     //return true when successfully created
     createNewUser(username, passwordHash){
-        return false;
+        if(!isUsernameAvailable(username)){
+            return false;
+        }   
+        this.users.push({username:username, passwordHash:passwordHash})
+        return true;
     }
 
     getPasswordHash(username){
-        // get hash from db
-        return null;
+        const user = this.users.find((user) => user.username === username);
+        return user?.passwordHash;
     }
 
 
