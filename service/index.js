@@ -23,7 +23,7 @@ app.use("/api", APIRouter);
 
 const checkToken = (req, res, next) => {
     const token = req.cookies[TOKEN_NAME];
-    if(!token || !username){
+    if(!token){
         res.status(401).send({message:"Missing credentials, try signing in again."});
     }else if(!myAuthVerifier.verifySessionToken(token)){
         res.status(401).send({message:"Incorrect token, try signing in again."});
@@ -35,7 +35,17 @@ const checkToken = (req, res, next) => {
 
 APIRouter.post("/auth/create", async (req, res)=>{
     const username = req.body?.username, password = req.body?.password;
-    if(!username || !password) res.status(401).send({success:false, message:"Missing password or username"});
+    if(!username || !password) {
+        res.status(401).send({success:false, message:"Missing password or username"}); 
+        return;
+    }
+
+    const passwordStatus = validPassword(password);
+    if(!passwordStatus.valid){
+        const message = `Password must include ${passwordStatus.reasons.forEach((val,i)=>{`${i}) ${val} \n`})}`;
+        res.status(401).send({success:false, message:message}); 
+        return;
+    }
 
     const pwhash = await bcrypt.hash(password);
     const success = myDatabase.createNewUser(username, pwhash);
@@ -66,10 +76,16 @@ APIRouter.post("/auth/login", (req, res)=>{
 });
 
 APIRouter.delete("/auth/logout", checkToken, (req, res)=>{
-    const username = req.cookies[USERNAME];
-    if(!username)res.status(401).send({message:"Couldn't find user."});
+    const token = req.cookies[TOKEN_NAME];
+    if(!token)res.status(401).send({message:"Couldn't find user."});
 
-    myAuthVerifier.endSession(username);
+    myAuthVerifier.endSession(token);
     res.status(200).send({message:"User successfully signed out"});
-
 });
+
+
+APIRouter.get("/chat/getChatData", checkToken, ()=>{});
+
+
+APIRouter.post("/chat/sendMessage", ()=>{});
+
