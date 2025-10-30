@@ -19,15 +19,15 @@ export default class verifyAuth{
 
     #generateSessionToken(user){
         const token = crypto.randomUUID();
-        this.sessionTokens[user] = token;
+        this.sessionTokens[token] = user;
         return token;
     }
 
-    verifySessionToken(user, token){
-        return this.sessionTokens[user] === token;
+    verifySessionToken(token){
+        return this.sessionTokens.hasOwnProperty(token);
     }
 
-    endSession(user){
-        delete this.sessionTokens[user];
+    endSession(token){
+        delete this.sessionTokens[token];
     }
 }

@@ -22,10 +22,10 @@ const APIRouter = express.Router();
 app.use("/api", APIRouter);
 
 const checkToken = (req, res, next) => {
-    const token = req.cookies[TOKEN_NAME], username = req.cookies[USERNAME];
+    const token = req.cookies[TOKEN_NAME];
     if(!token || !username){
         res.status(401).send({message:"Missing credentials, try signing in again."});
-    }else if(!myAuthVerifier.verifySessionToken(username, token)){
+    }else if(!myAuthVerifier.verifySessionToken(token)){
         res.status(401).send({message:"Incorrect token, try signing in again."});
     }else{
         next();
