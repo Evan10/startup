@@ -42,7 +42,7 @@ APIRouter.post("/auth/create", async (req, res)=>{
 
     const passwordStatus = validPassword(password);
     if(!passwordStatus.valid){
-        const message = `Password must include ${passwordStatus.reasons.forEach((val,i)=>{`${i}) ${val} \n`})}`;
+        const message = `Invalid password. Password must include ${passwordStatus.reasons.map((val,i)=>{`${i+1}) ${val}`}).join("\n")}`;
         res.status(401).send({success:false, message:message}); 
         return;
     }
@@ -80,12 +80,21 @@ APIRouter.delete("/auth/logout", checkToken, (req, res)=>{
     if(!token)res.status(401).send({message:"Couldn't find user."});
 
     myAuthVerifier.endSession(token);
-    res.status(200).send({message:"User successfully signed out"});
+    res.status(200).send({message:"User successfully signed out"}).clearCookie(TOKEN_NAME);
 });
 
 
-APIRouter.get("/chat/getChatData", checkToken, ()=>{});
+APIRouter.post("/chat/createChat", checkToken, (req, res)=>{
+    const title = req.body?.title;
 
 
-APIRouter.post("/chat/sendMessage", ()=>{});
+});
+
+APIRouter.get("/chat/getChat", (req, res)=>{
+    const chatID = req.body?.chatID;
+    const chatData = myDatabase.getChatWithID(chatID);
+    res.status(200).send(chatData);
+});
+
+APIRouter.post("/chat/sendMessage", checkToken, (req, res)=>{});
 

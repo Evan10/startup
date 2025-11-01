@@ -5,6 +5,7 @@ export default class verifyAuth{
     constructor(dbConnecion){
         this.dbConnecion = dbConnecion;
         this.sessionTokens = {};
+        this.guestTokens = {};
     }
 
     async verifyCredentials(username,password){
@@ -16,6 +17,8 @@ export default class verifyAuth{
         }
         return false;
     }
+
+    
 
     #generateSessionToken(user){
         const token = crypto.randomUUID();
@@ -29,5 +32,17 @@ export default class verifyAuth{
 
     endSession(token){
         delete this.sessionTokens[token];
+    }
+
+    generateGuestToken(guestName){
+        const token = crypto.randomUUID();
+        this.guestTokens[token] = guestName;
+        return token;
+    }
+    verifyGuestToken(token){
+        return this.guestTokens.hasOwnProperty(token);
+    }
+    endGuestSession(token){
+        delete this.guestTokens[token];
     }
 }

@@ -22,16 +22,22 @@ export default class testDB{
         if(!this.isUsernameAvailable(username)){
             return false;
         }   
-        this.users.push({username:username, passwordHash:passwordHash})
+        this.users.push({username:username, passwordHash:passwordHash, chats:[]})
         return true;
+    }
+
+    updateUserChats(username, chatID){
+        this.users[username]?.chats?.push(chatID);
+    }
+
+    getUserChats(username){
+        return this.users[username]?.chats;
     }
 
     getPasswordHash(username){
         const user = this.users.find((user) => user.username === username);
         return user?.passwordHash;
     }
-
-
 
     getJoinCodes(){
         return this.joinCodes;    
@@ -62,7 +68,15 @@ export default class testDB{
         const chat = this.chats[chatID];
         if (!chat) return false;
         if (username !== chat.owner) return false;
+        this.#removeJoinCode(this.chats[chatID].joinCode)
         delete this.chats[chatID];
+        return true;
+    }
+
+    #removeJoinCode(joinCode){
+        const idx = this.joinCodes.indexOf(joinCode);
+        if(idx === -1){return false;}
+        this.joinCodes.splice(idx,1);
         return true;
     }
 
