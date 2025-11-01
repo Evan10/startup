@@ -44,9 +44,9 @@ export default class testDB{
     }
 
     createNewChat(chatName, chatID, user, joinCode){
-        this.chats[chatID] = {owner:user, joinCode:joinCode, chatName:chatName, messages:[], };
+        this.chats[chatID] = {owner:user, joinCode:joinCode, chatName:chatName, messages:[], users:[owner.username]};
         this.joinCodes.push(joinCode);
-        return true;
+        return chats[chatID];
     }
 
     getChatWithID(chatID){
@@ -62,6 +62,12 @@ export default class testDB{
     updateChatData(chatID, chatData){
         this.chats[chatID] = chatData;
         return true;
+    }
+
+    addChatMessage(username, message, chatID){
+        const chat = this.chats[chatID];
+        if(username in chat.users ){chat.messages.push(message);return true}
+        return false;
     }
 
     deleteChat(username, chatID){

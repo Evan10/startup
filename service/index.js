@@ -6,6 +6,7 @@ import testDB from "./Database/testDB"; // eventually replace with db connection
 import AuthVerifier from "./Auth/verifyAuth";
 import validPassword from "./Auth/verifyValidPassword";
 import {TOKEN_NAME, USERNAME} from "./consts"
+import {generateJoinCode} from "./Util";
 
 const myDatabase = testDB({dbUsername:"test", dbPassword:"test"});
 const myAuthVerifier = AuthVerifier(myDatabase);
@@ -86,25 +87,33 @@ APIRouter.delete("/auth/logout", checkToken, (req, res)=>{
 APIRouter.patch("/chat/JoinChat", checkToken, (req, res)=>{
     const joinCode = req.body?.joinCode;
     const token = req.cookies[TOKEN_NAME];
+    const user = myAuthVerifier.getUserWithToken(token);
     const chat = myDatabase.getChatWithJoinCode(joinCode);
-
-
+    myDatabase.updateUserChats(user.username,chat.chatID);
+    res.status(200).end();
 });
 
 APIRouter.post("/chat/createChat", checkToken, (req, res)=>{
     const title = req.body?.title;
-
-
+    const chatID = crypto.randomUUID();
+    const token = req.cookies[TOKEN_NAME];
+    const user = myAuthVerifier.getUserWithToken(token);
+    const chatJoinCode = generateJoinCode();
+    const chat = myDatabase.createNewChat(title,chatID,user,chatJoinCode);
+    res.send(chat);
 });
 
 APIRouter.get("/chat/getChat", checkToken, (req, res)=>{
     const chatID = req.body?.chatID;
     const isGuest = req.body?.isGuest;
     const userToken = req.cookies[TOKEN_NAME];
-    const chatData = myDatabase.getChatWithID(chatID);
-    if(chatData)
-    if(!chatData){res.status(400).end();return;}
-    res.status(200).send(chatData);
+    const user = myAuthVerifier.getUserWithToken(token); 
+    const chat = myDatabase.getChatWithID(chatID);
+    if(!chat){res.status(400).end();return;}
+    if(!(user.username in chat.users)){
+        res.status(401).end();
+    }
+    res.status(200).send(chat);
 });
 
 APIRouter.post("/chat/sendMessage", checkToken, (req, res)=>{});
