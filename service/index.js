@@ -83,6 +83,13 @@ APIRouter.delete("/auth/logout", checkToken, (req, res)=>{
     res.status(200).send({message:"User successfully signed out"}).clearCookie(TOKEN_NAME);
 });
 
+APIRouter.patch("/chat/JoinChat", checkToken, (req, res)=>{
+    const joinCode = req.body?.joinCode;
+    const token = req.cookies[TOKEN_NAME];
+    const chat = myDatabase.getChatWithJoinCode(joinCode);
+
+
+});
 
 APIRouter.post("/chat/createChat", checkToken, (req, res)=>{
     const title = req.body?.title;
@@ -90,9 +97,13 @@ APIRouter.post("/chat/createChat", checkToken, (req, res)=>{
 
 });
 
-APIRouter.get("/chat/getChat", (req, res)=>{
+APIRouter.get("/chat/getChat", checkToken, (req, res)=>{
     const chatID = req.body?.chatID;
+    const isGuest = req.body?.isGuest;
+    const userToken = req.cookies[TOKEN_NAME];
     const chatData = myDatabase.getChatWithID(chatID);
+    if(chatData)
+    if(!chatData){res.status(400).end();return;}
     res.status(200).send(chatData);
 });
 

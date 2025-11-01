@@ -44,7 +44,7 @@ export default class testDB{
     }
 
     createNewChat(chatName, chatID, user, joinCode){
-        this.chats[chatID] = {owner:user, joinCode:joinCode, chatName:chatName, messages:[]};
+        this.chats[chatID] = {owner:user, joinCode:joinCode, chatName:chatName, messages:[], };
         this.joinCodes.push(joinCode);
         return true;
     }

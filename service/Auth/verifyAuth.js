@@ -30,6 +30,10 @@ export default class verifyAuth{
         return this.sessionTokens.hasOwnProperty(token);
     }
 
+    getUserWithToken(token){
+        return this.sessionTokens[token];
+    }
+
     endSession(token){
         delete this.sessionTokens[token];
     }
