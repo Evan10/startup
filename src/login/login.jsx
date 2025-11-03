@@ -14,17 +14,19 @@ export function Login({updateUser, user}) {
             return;
         }
             
-        fetch("/api/auth/login",{method:"post", body:JSON.stringify({
+        fetch("/api/auth/login",{method:"post",
+            headers: { "Content-Type": "application/json" },
+            body:JSON.stringify({
             username:formData.get("username"),
             password:formData.get("password")
         })})
         .then(res=>res.json())
         .then(res=>{if(res.success){
             updateUser(formData.get("username"))
+            navigate("/")
         }else{
             throw new Error(res.message);
         }})
-        .then(()=>navigate("/"))
         .catch((reason)=>{alert(reason)});
     }
 
@@ -36,17 +38,19 @@ export function Login({updateUser, user}) {
             return;
         }
         
-        fetch("/api/auth/create",{method:"post", body:JSON.stringify({
+        fetch("/api/auth/create",{method:"POST", 
+            headers: { "Content-Type": "application/json" },
+            body:JSON.stringify({
             username:formData.get("username"),
             password:formData.get("password")
         })})
         .then(res=>res.json())
         .then(res=>{if(res.success){
             updateUser(formData.get("username"))
+            navigate("/")
         }else{
             throw new Error(res.message);
         }})
-        .then(()=>navigate("/"))
         .catch((reason)=>{alert(reason)});
     }
 

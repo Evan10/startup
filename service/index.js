@@ -2,14 +2,16 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import bcrypt from "bcrypt"
 
-import testDB from "./Database/testDB"; // eventually replace with db connection
-import AuthVerifier from "./Auth/verifyAuth";
-import validPassword from "./Auth/verifyValidPassword";
-import {TOKEN_NAME, USERNAME} from "./consts"
-import {generateJoinCode} from "./Util";
+import testDB from "./Database/testDB.js"; // eventually replace with db connection
+import AuthVerifier from "./Auth/verifyAuth.js";
+import validPassword from "./Auth/verifyValidPassword.js";
+import {TOKEN_NAME, USERNAME} from "./consts.js"
+import {generateJoinCode} from "./Util.js";
 
-const myDatabase = testDB({dbUsername:"test", dbPassword:"test"});
-const myAuthVerifier = AuthVerifier(myDatabase);
+const port = 3000;
+
+const myDatabase = new testDB({dbUsername:"test", dbPassword:"test"});
+const myAuthVerifier = new AuthVerifier(myDatabase);
 
 const app = express();
 
@@ -42,13 +44,15 @@ APIRouter.post("/auth/create", async (req, res)=>{
     }
 
     const passwordStatus = validPassword(password);
+    console.log(passwordStatus);
     if(!passwordStatus.valid){
-        const message = `Invalid password. Password must include ${passwordStatus.reasons.map((val,i)=>{`${i+1}) ${val}`}).join("\n")}`;
-        res.status(401).send({success:false, message:message}); 
+        const message = `Invalid password. Password must include:\n 
+        ${passwordStatus.reasons.map((val,i)=>`${i+1}) ${val}`).join("\n")}`;
+        res.status(401).send({success:false, message:message}).end(); 
         return;
     }
 
-    const pwhash = await bcrypt.hash(password);
+    const pwhash = await bcrypt.hash(password, 10);
     const success = myDatabase.createNewUser(username, pwhash);
 
     if (success){
@@ -68,11 +72,15 @@ APIRouter.post("/auth/create", async (req, res)=>{
     }
 });
 
-APIRouter.post("/auth/login", (req, res)=>{
+APIRouter.post("/auth/login", async (req, res)=>{
+    console.log(req.body)
     const username = req.body?.username, password = req.body?.password;
-    if(!username || !password) res.status(401).send({success:false, message:"Missing password or username"});
-
-    const token = myAuthVerifier.verifyCredentials(username, password);
+    if(!username || !password) {
+        res.status(401).send({success:false, message:"Missing password or username"});
+        return;
+    }
+    const token = await myAuthVerifier.verifyCredentials(username, password);
+    console.log(token)
     if(!token){
         res.status(401).send({success:false,message:"Incorrect username or password"});
     }else{
@@ -139,3 +147,8 @@ APIRouter.post("/chat/sendMessage", checkToken, (req, res)=>{
     res.send(200).end();
 });
 
+
+
+app.listen(port,()=>{
+    console.log(`Listening on port ${port}`)
+})

@@ -13,7 +13,7 @@ export default function verifyValidPassword(password){
         reasons.push(`Password is too short. Must be at least ${MIN_PASSWORD_LENGTH} characters long.`);
     } 
     if (password.length > MAX_PASSWORD_LENGTH){
-        reasons.push(`Password is too long. Must be at most ${MIN_PASSWORD_LENGTH} characters long.`);
+        reasons.push(`Password is too long. Must be at most ${MAX_PASSWORD_LENGTH} characters long.`);
     } 
     if(!REGEX_CONTAIN_CAPITAL.test(password)){
         reasons.push("Password must contain an uppercase letter");
