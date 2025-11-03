@@ -14,6 +14,10 @@ export function Login({updateUser, user}) {
             return;
         }
             
+        fetch("/api/auth/login",{method:"post", body:JSON.stringify({
+            username:formData.get("username"),
+            password:formData.get("password")
+        })})
 
         const loginInfo = JSON.parse(localStorage.getItem("loginInfo"));
         

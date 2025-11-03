@@ -45,17 +45,23 @@ export function Chat({ user, chatId }) {
     fetch("/api/chat/sendMessage", {method:"POST", body:{
       chatID:chatID,
       message:messageData
-    }})
+    }});
 
     setTimeout(()=>{scrollToEnd()},50);
   };
 
   const sendFile = (flData) => {
-        const fileMessageData = {type:"file",content:flData, user: user, state:messageState.Sending, id:crypto.randomUUID()}
+    const fileMessageData = {type:"file",content:flData, user: user, state:messageState.Sending, id:crypto.randomUUID()}
     updateMessages((msgs) => {
-        return [...msgs, fileMessageData]
-      });
-      setTimeout(()=>{scrollToEnd()},50);
+      return [...msgs, fileMessageData]
+    });
+    
+    fetch("/api/chat/sendMessage", {method:"POST", body:{
+      chatID:chatID,
+      message:fileMessageData
+    }});
+
+    setTimeout(()=>{scrollToEnd()},50);
   }
 
   const scrollToEnd = () => {

@@ -56,7 +56,12 @@ APIRouter.post("/auth/create", async (req, res)=>{
         if(!token){
             res.status(401).send({success:false,message:"Account was created but you weren't signed in"});
         }else{
-            res.send({success:true, sessionToken:token});
+            res.cookie(TOKEN_NAME,token,{
+            httpOnly: true,
+            secure: true,
+            maxAge: 1000 * 60 * 60 * 24
+        })
+            res.send({success:true});
         }
     }else{
         res.status(401).send({success:false,message:"Account could not be created"});
@@ -71,6 +76,11 @@ APIRouter.post("/auth/login", (req, res)=>{
     if(!token){
         res.status(401).send({success:false,message:"Incorrect username or password"});
     }else{
+        res.cookie(TOKEN_NAME,token,{
+            httpOnly: true,
+            secure: true,
+            maxAge: 1000 * 60 * 60 * 24
+        })
         res.send({success:true, sessionToken:token});
     }
 
