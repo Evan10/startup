@@ -81,7 +81,7 @@ APIRouter.post("/auth/login", (req, res)=>{
             secure: true,
             maxAge: 1000 * 60 * 60 * 24 * 7
         })
-        res.send({success:true, sessionToken:token});
+        res.send({success:true});
     }
 
 });

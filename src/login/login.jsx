@@ -3,8 +3,8 @@ import {useNavigate} from "react-router-dom"
 import "../app.css"
 
 export function Login({updateUser, user}) {
-     const navigate = useNavigate();
-
+    const navigate = useNavigate();
+     
     const handleLogin = (e) =>{
         e.preventDefault();
         const formData = new FormData(e.target);
@@ -51,6 +51,7 @@ export function Login({updateUser, user}) {
     }
 
     const handleLogout = () => {
+        fetch("/api/auth/logout",{method:"DELETE"});
         updateUser("");
     }
 
@@ -83,6 +84,7 @@ export function Login({updateUser, user}) {
                                     <input className="row w-75" name="password" id="new-password" type="password" required placeholder="password" />
                                     <button id="new-account-submit" type="submit" className="row">Create Account</button>
                                 </div>
+                                <p></p>
                             </form>
                         </div>
                     </div>
