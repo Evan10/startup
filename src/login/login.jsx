@@ -18,17 +18,14 @@ export function Login({updateUser, user}) {
             username:formData.get("username"),
             password:formData.get("password")
         })})
-
-        const loginInfo = JSON.parse(localStorage.getItem("loginInfo"));
-        
-        if (loginInfo?.username == formData.get("username") && loginInfo?.password == formData.get("password")){
+        .then(res=>res.json())
+        .then(res=>{if(res.success){
             updateUser(formData.get("username"))
         }else{
-            alert("Incorrect Login")
-            return;
-        }
-
-        navigate("/");
+            throw new Error(res.message);
+        }})
+        .then(()=>navigate("/"))
+        .catch((reason)=>{alert(reason)});
     }
 
         const handleNewAccount= (e) =>{
@@ -38,11 +35,19 @@ export function Login({updateUser, user}) {
             alert("Please fill out all required fields!");
             return;
         }
-
-        localStorage.setItem("loginInfo",JSON.stringify({username:formData.get("username"),password:formData.get("password")}))
-        updateUser(formData.get("username"))
-
-        navigate("/");
+        
+        fetch("/api/auth/create",{method:"post", body:JSON.stringify({
+            username:formData.get("username"),
+            password:formData.get("password")
+        })})
+        .then(res=>res.json())
+        .then(res=>{if(res.success){
+            updateUser(formData.get("username"))
+        }else{
+            throw new Error(res.message);
+        }})
+        .then(()=>navigate("/"))
+        .catch((reason)=>{alert(reason)});
     }
 
     const handleLogout = () => {

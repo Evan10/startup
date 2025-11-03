@@ -79,7 +79,7 @@ APIRouter.post("/auth/login", (req, res)=>{
         res.cookie(TOKEN_NAME,token,{
             httpOnly: true,
             secure: true,
-            maxAge: 1000 * 60 * 60 * 24
+            maxAge: 1000 * 60 * 60 * 24 * 7
         })
         res.send({success:true, sessionToken:token});
     }
