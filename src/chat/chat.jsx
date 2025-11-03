@@ -16,56 +16,38 @@ export function Chat({ user, chatId }) {
   const endOfSectionRef = useRef(null);
 
   useEffect(() => { 
-    const chatAsString = localStorage.getItem(`Chat:${chatID}`);
-    if (!chatAsString){
-      alert("Chat not found");
-      setTimeout(()=>{navigate("/")}, 3000);
-      return;
-    }
-    const chat = JSON.parse(chatAsString);
-
-    updateTitle(chat.title);
-    updateMessages(chat.messages);
-
-    setInterval(() => {
-      updateMessages((msgs) => {
-        return [...msgs, {
-          type:"text",
-          user: "321",
-          content: `This is a test`,
-          state: messageState.Sending,
-          id: crypto.randomUUID()
-        }]
-      }
-      )
-
-      updateMessages((msgs) => {
-        return [...msgs, {
-          type:"file",
-          user: "321",
-          content: `thirdPartyURLStuff`,
-          state: messageState.Sending,
-          id: crypto.randomUUID()
-        }]
-      }
-      )
-    }, 5000);//simulate recieving messages
-
+    fetch("/api/chat/getChat",{
+        method:'GET',
+        headers: { 'content-type': 'application/json' },
+        body:JSON.stringify({
+          chatID:chatID,
+          isGuest:user != null
+        }) 
+      }).then((res)=>{if(!res.ok){
+        throw new Error("Chat not found");
+      }}).then((res)=>res.json())
+      .then((chat)=>{
+        updateTitle(chat.title);
+        updateMessages(chat.messages);
+      }).catch((err)=>{
+        alert("Chat not found");
+        setTimeout(()=>{navigate("/")}, 3000);
+      });
   }, [chatID]);
 
-  useEffect(() => { 
-    if(chatID == null)return;
-
-    const data = JSON.stringify({title:title, messages:messages});
-    localStorage.setItem(`Chat:${chatID}`, data);
-  }, [messages]);
 
   const sendMessage = (msg) => {
     const messageData = {type:"text",content:msg, user: user, state:messageState.Sending, id:crypto.randomUUID()}
     updateMessages((msgs) => {
         return [...msgs, messageData]
       });
-      setTimeout(()=>{scrollToEnd()},50);
+
+    fetch("/api/chat/sendMessage", {method:"POST", body:{
+      chatID:chatID,
+      message:messageData
+    }})
+
+    setTimeout(()=>{scrollToEnd()},50);
   };
 
   const sendFile = (flData) => {

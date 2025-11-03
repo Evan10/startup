@@ -116,5 +116,16 @@ APIRouter.get("/chat/getChat", checkToken, (req, res)=>{
     res.status(200).send(chat);
 });
 
-APIRouter.post("/chat/sendMessage", checkToken, (req, res)=>{});
+APIRouter.post("/chat/sendMessage", checkToken, (req, res)=>{
+    const token = req.cookies[TOKEN_NAME];
+    const user = myAuthVerifier.getUserWithToken(token);
+    const chatID = req.body?.chatID;
+    const message = req.body?.message;
+    message.createdOn = new Date().toUTCString();
+    // give the message a new id to stop someone theoretically 
+    // manually editing id to cause a double up of ids which would cause error on the front end
+    message.id = crypto.randomUUID(); 
+    myDatabase.addChatMessage(user.username,message, chatID);
+    res.send(200).end();
+});
 
