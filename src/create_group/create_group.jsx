@@ -3,58 +3,29 @@ import {useNavigate} from "react-router-dom"
 import "../app.css"
 import messageState from '../chat/messageState';
 
-export function CreateGroup({user}) {
+export function CreateGroup({user,}) {
     const navigate = useNavigate();
 
-    const handleFormSubmit = (e) => {
+    const handleCreateChat = (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
+        const groupName = formData.get("groupName");
+
+        fetch("/api/chat/createChat", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({
+          title:groupName
+        })})
+        .then(res=>res.json())
+        .then(res=>{
+          navigate(`/chat/${res.chatID}`);
+        });
+
         
-        const chatID = crypto.randomUUID();
-
-        const tempMessageData = [{
-              type:"text",
-              user: "123",
-              content: "This is a text message",
-              state: messageState.Seen,
-              id: crypto.randomUUID()
-            }, {
-              type:"text",
-              user: "321",
-              content: "This is another text message",
-              state: messageState.Seen,
-              id: crypto.randomUUID()
-            }, {
-              type:"text",
-              user: "123",
-              content: "testing",
-              state: messageState.Delivered,
-              id: crypto.randomUUID()
-            }, {
-              type:"text",
-              user: "123",
-              content: "This is yet another message",
-              state: messageState.Sending,
-              id: crypto.randomUUID()
-            }]
-
-        const chatKey = "Chat:"+chatID;
-        const chatInfo = JSON.stringify({title:formData.get("groupName"),messages:tempMessageData});
-
-        localStorage.setItem(chatKey, chatInfo)
-        
-        const chats = JSON.parse(localStorage.getItem("Chats")) || {};
-        
-        chats[chatID] = formData.get("groupName");
-        localStorage.setItem("Chats", JSON.stringify(chats));
-
-        navigate(`/chat/${chatID}`);
     }
 
   return (
     <div className="container-fluid text-center">
     <div className="form-format">
-        <form className="form-format" onSubmit={handleFormSubmit}> 
+        <form className="form-format" onSubmit={handleCreateChat}> 
             <input className="form-input-format" name="groupName" type="text" required placeholder="Group Name"/>
             {user.length == 0? <p>Log in to create a group</p> : <button className="form-input-format" type="submit">Create Group</button>}
         </form>

@@ -32,11 +32,16 @@ export default class testDB{
     }
     removeUserChat(username, chatID){
         const idx = this.users[username]?.chats?.indexOf(chatID);
-        this.users[username]?.chats?.splice(idx,1);
+        const user = getUser(username)
+        user?.chats?.splice(idx,1);
     }
 
+    getUser(username){
+        return this.users.find((user) => user.username === username)
+    }
+    
     getUserChats(username){
-        return this.users[username]?.chats;
+        return this.getUser(username)?.chats;
     }
 
     getPasswordHash(username){
@@ -52,7 +57,7 @@ export default class testDB{
         this.chats[chatID] = {owner:user, joinCode:joinCode, title:chatName, messages:[], users:[user.username]};
         user.chats.push(chatID);
         this.joinCodes.push(joinCode);
-        return chats[chatID];
+        return chatID;
     }
 
     getChatWithID(chatID){

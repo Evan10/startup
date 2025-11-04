@@ -21,7 +21,7 @@ export function Chat({ user, chatId }) {
         headers: { 'content-type': 'application/json' },
         body:JSON.stringify({
           chatID:chatID,
-          isGuest:user != null
+          isGuest:!user
         }) 
       }).then((res)=>{if(!res.ok){
         throw new Error("Chat not found");

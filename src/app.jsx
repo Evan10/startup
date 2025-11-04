@@ -21,15 +21,18 @@ export default function App() {
     else {
       updateUser(username);
       fetch("/api/chat/getUserChats", { method: 'GET', headers: { "Content-Type": "application/json" }})
-      .then((res)=>res.json())
       .then((res)=>{
-        console.log(res);
-        updateChats(res);
+        if(res.ok){return res.json()}else{return false}})
+      .then((res)=>{
+        if(res){
+          console.log(res);
+          updateChats(res);
+        }
       })
       
     }
 
-  }, [])
+  }, []);
 
   return (
     <BrowserRouter>
@@ -45,7 +48,11 @@ export default function App() {
               {user.length !== 0 && (<li className="nav-link nav-item dropdown">
                 <span>Chats</span>
                 <ul className='dropdown-menu'>
-                  {AvailableChats.map((c) => { return <li><NavLink className=" dropdown-item" to={`/chat/${c.chatID}`}>{c.title}</NavLink></li> })}
+                  {AvailableChats && AvailableChats.map((c) => {
+                     return <li key={c.chatID} >
+                      <NavLink  className=" dropdown-item" to={`/chat/${c.chatID}`}>{c.title}</NavLink>
+                      </li> 
+                    })}
                 </ul>
               </li>)
               }

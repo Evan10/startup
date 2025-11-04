@@ -31,7 +31,8 @@ export default class verifyAuth{
     }
 
     getUserWithToken(token){
-        return this.sessionTokens[token];
+        const username = this.sessionTokens[token];
+        return this.dbConnecion.getUser(username);
     }
 
     endSession(token){
