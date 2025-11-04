@@ -8,8 +8,8 @@ export function Login({updateUser, user}) {
     const handleLogin = (e) =>{
         e.preventDefault();
         const formData = new FormData(e.target);
-        
-        if(!formData.get("username") || !formData.get("password")){
+        const username = formData.get("username"), password = formData.get("password");
+        if(!username || !password){
             alert("Please fill out all required fields!");
             return;
         }
@@ -17,13 +17,14 @@ export function Login({updateUser, user}) {
         fetch("/api/auth/login",{method:"post",
             headers: { "Content-Type": "application/json" },
             body:JSON.stringify({
-            username:formData.get("username"),
-            password:formData.get("password")
+            username:username,
+            password:password
         })})
         .then(res=>res.json())
         .then(res=>{if(res.success){
-            updateUser(formData.get("username"))
-            navigate("/")
+            updateUser(username)
+            localStorage.setItem("username",username);
+            navigate("/");
         }else{
             throw new Error(res.message);
         }})
@@ -33,7 +34,8 @@ export function Login({updateUser, user}) {
         const handleNewAccount= (e) =>{
         e.preventDefault();
         const formData = new FormData(e.target);
-        if(!formData.get("username") || !formData.get("password") ){
+        const username = formData.get("username"), password = formData.get("password");
+        if(!username || !password){
             alert("Please fill out all required fields!");
             return;
         }
@@ -41,12 +43,13 @@ export function Login({updateUser, user}) {
         fetch("/api/auth/create",{method:"POST", 
             headers: { "Content-Type": "application/json" },
             body:JSON.stringify({
-            username:formData.get("username"),
-            password:formData.get("password")
+            username:username,
+            password:password
         })})
         .then(res=>res.json())
         .then(res=>{if(res.success){
-            updateUser(formData.get("username"))
+            localStorage.setItem("username",username);
+            updateUser(formData.get("username"));
             navigate("/")
         }else{
             throw new Error(res.message);

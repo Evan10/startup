@@ -22,12 +22,17 @@ export default class testDB{
         if(!this.isUsernameAvailable(username)){
             return false;
         }   
-        this.users.push({username:username, passwordHash:passwordHash, chats:[]})
-        return true;
+        const user = {username:username, passwordHash:passwordHash, chats:[]};
+        this.users.push(user)
+        return user;
     }
 
-    updateUserChats(username, chatID){
+    addUserChats(username, chatID){
         this.users[username]?.chats?.push(chatID);
+    }
+    removeUserChat(username, chatID){
+        const idx = this.users[username]?.chats?.indexOf(chatID);
+        this.users[username]?.chats?.splice(idx,1);
     }
 
     getUserChats(username){
@@ -44,7 +49,8 @@ export default class testDB{
     }
 
     createNewChat(chatName, chatID, user, joinCode){
-        this.chats[chatID] = {owner:user, joinCode:joinCode, chatName:chatName, messages:[], users:[owner.username]};
+        this.chats[chatID] = {owner:user, joinCode:joinCode, title:chatName, messages:[], users:[user.username]};
+        user.chats.push(chatID);
         this.joinCodes.push(joinCode);
         return chats[chatID];
     }

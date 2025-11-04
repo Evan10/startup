@@ -107,7 +107,7 @@ APIRouter.patch("/chat/JoinChat", checkToken, (req, res)=>{
     const token = req.cookies[TOKEN_NAME];
     const user = myAuthVerifier.getUserWithToken(token);
     const chat = myDatabase.getChatWithJoinCode(joinCode);
-    myDatabase.updateUserChats(user.username,chat.chatID);
+    myDatabase.addUserChats(user.username,chat.chatID);
     res.status(200).end();
 });
 
@@ -119,6 +119,15 @@ APIRouter.post("/chat/createChat", checkToken, (req, res)=>{
     const chatJoinCode = generateJoinCode();
     const chat = myDatabase.createNewChat(title,chatID,user,chatJoinCode);
     res.send(chat);
+});
+
+
+APIRouter.get("/chat/getUserChats", checkToken, (req, res)=>{
+    const userToken = req.cookies[TOKEN_NAME];
+    const user = myAuthVerifier.getUserWithToken(userToken); 
+    const allChats = myDatabase.getUserChats(user.username);
+    const chats = allChats.map((id)=>{return {chatID:id,title:myDatabase.getChatWithID(id).title}})
+    res.status(200).send(chats);
 });
 
 APIRouter.get("/chat/getChat", checkToken, (req, res)=>{
