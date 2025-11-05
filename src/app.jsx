@@ -14,25 +14,32 @@ export default function App() {
   const [user, updateUser] = useState("");
   const [AvailableChats, updateChats] = useState([]);
 
+  const logoutCleanup = () =>{
+    updateChats([]);
+  }
+
+  const loadUserChats = ()=>{
+    fetch("/api/chat/getUserChats", { method: 'GET', headers: { "Content-Type": "application/json" }})
+          .then((res)=>{
+            if(res.ok){return res.json()}else{return false}})
+          .then((res)=>{
+              updateChats(res);
+          });
+  }; 
+
   useEffect(() => {
-
-    const username = localStorage.getItem("username");
-    if (!username) { return; }
-    else {
-      updateUser(username);
-      fetch("/api/chat/getUserChats", { method: 'GET', headers: { "Content-Type": "application/json" }})
-      .then((res)=>{
-        if(res.ok){return res.json()}else{return false}})
-      .then((res)=>{
-        if(res){
-          console.log(res);
-          updateChats(res);
-        }
-      })
-      
-    }
-
+    fetch("/api/auth/getSelf", {method: "GET",headers:{"Content-Type":"application/json"}})
+    .then((res)=>res.json())
+    .then(res=>{
+      if("username" in res){
+        updateUser(res.username);
+      }
+    });
   }, []);
+
+  useEffect(()=>{
+    loadUserChats();
+  },[user]);
 
   return (
     <BrowserRouter>
@@ -63,7 +70,7 @@ export default function App() {
         <main>
           <Routes>
             <Route path='/' element={<LandingPage user={user} />} exact />
-            <Route path='/login' element={<Login updateUser={updateUser} user={user} />} />
+            <Route path='/login' element={<Login logoutCleanup={logoutCleanup} updateUser={updateUser} user={user} />} />
             <Route path='/join_group' element={<JoinGroup user={user} />} />
             <Route path='/create_group' element={<CreateGroup user={user} />} />
             <Route path='/chat/:chatID' element={<Chat user={user} />} />

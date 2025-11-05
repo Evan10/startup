@@ -16,21 +16,18 @@ export function Chat({ user, chatId }) {
   const endOfSectionRef = useRef(null);
 
   useEffect(() => { 
-    fetch("/api/chat/getChat",{
+    console.log(chatID)
+    fetch(`/api/chat/getChat?chatID=${chatID}&isGuest=!${!user}`,{
         method:'GET',
-        headers: { 'content-type': 'application/json' },
-        body:JSON.stringify({
-          chatID:chatID,
-          isGuest:!user
-        }) 
-      }).then((res)=>{if(!res.ok){
+        headers: { 'content-type': 'application/json' }}) 
+      .then((res)=>{if(!res.ok){
         throw new Error("Chat not found");
       }}).then((res)=>res.json())
       .then((chat)=>{
         updateTitle(chat.title);
         updateMessages(chat.messages);
       }).catch((err)=>{
-        alert("Chat not found");
+        alert(err.message);
         setTimeout(()=>{navigate("/")}, 3000);
       });
   }, []);

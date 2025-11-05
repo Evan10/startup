@@ -2,7 +2,7 @@ import React from 'react';
 import {useNavigate} from "react-router-dom"
 import "../app.css"
 
-export function Login({updateUser, user}) {
+export function Login({logoutCleanup,updateUser, user}) {
     const navigate = useNavigate();
      
     const handleLogin = (e) =>{
@@ -23,7 +23,6 @@ export function Login({updateUser, user}) {
         .then(res=>res.json())
         .then(res=>{if(res.success){
             updateUser(username)
-            localStorage.setItem("username",username);
             navigate("/");
         }else{
             throw new Error(res.message);
@@ -59,6 +58,7 @@ export function Login({updateUser, user}) {
 
     const handleLogout = () => {
         fetch("/api/auth/logout",{method:"DELETE"});
+        logoutCleanup();
         updateUser("");
     }
 

@@ -15,6 +15,11 @@ const myAuthVerifier = new AuthVerifier(myDatabase);
 
 const app = express();
 
+app.use((req,res,next)=>{
+    Object.keys(myDatabase.chats).forEach(console.log)
+    next();
+});
+
 app.use(express.json());
 
 app.use(cookieParser());
@@ -102,7 +107,15 @@ APIRouter.delete("/auth/logout", (req, res)=>{
 
 APIRouter.get("/auth/getSelf", checkToken, (req,res)=>{
     const userToken = req.cookies[TOKEN_NAME];
+    if(!userToken){
+        res.send({});
+        return
+    }
     const user = myAuthVerifier.getUserWithToken(userToken);
+    if(!user){
+        res.send({});
+        return;
+    }
     res.send({username:user.username, chats:user.chats});
 })
 
@@ -130,20 +143,21 @@ APIRouter.get("/chat/getUserChats", checkToken, (req, res)=>{
     const userToken = req.cookies[TOKEN_NAME];
     const user = myAuthVerifier.getUserWithToken(userToken); 
     const allChats = myDatabase.getUserChats(user.username);
-    console.log(allChats);
+    if(!allChats){res.status(200).send({}).end();return;}
     const chats = allChats.map((id)=>{return {chatID:id,title:myDatabase.getChatWithID(id).title}})
     res.status(200).send(chats);
 });
 
 APIRouter.get("/chat/getChat", checkToken, (req, res)=>{
-    const chatID = req.body?.chatID;
-    const isGuest = req.body?.isGuest;
+    const chatID = req.query?.chatID;
+    const isGuest = req.query?.isGuest;
     const userToken = req.cookies[TOKEN_NAME];
     const user = myAuthVerifier.getUserWithToken(userToken); 
     const chat = myDatabase.getChatWithID(chatID);
     if(!chat){res.status(400).end();return;}
-    if(!(user.username in chat.users)){
+    if(!(chat.users.includes(user.username))){
         res.status(401).end();
+        return;
     }
     res.status(200).send(chat);
 });
