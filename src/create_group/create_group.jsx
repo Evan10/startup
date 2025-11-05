@@ -3,7 +3,7 @@ import {useNavigate} from "react-router-dom"
 import "../app.css"
 import messageState from '../chat/messageState';
 
-export function CreateGroup({user, userChats, updateChats}) {
+export function CreateGroup({user, AvailableChats, updateChats}) {
     const navigate = useNavigate();
 
     const handleCreateChat = (e) => {
@@ -16,7 +16,7 @@ export function CreateGroup({user, userChats, updateChats}) {
         })})
         .then(res=>res.json())
         .then(res=>{
-          updateChats([...userChats, {title:groupName, chatID:res.chatID}]);
+          updateChats([...AvailableChats, {title:groupName, chatID:res.chatID}]);
           navigate(`/chat/${res.chatID}`);
         });
 

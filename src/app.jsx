@@ -73,7 +73,7 @@ export default function App() {
             <Route path='/' element={<LandingPage user={user} />} exact />
             <Route path='/login' element={<Login logoutCleanup={logoutCleanup} updateUser={updateUser} user={user} />} />
             <Route path='/join_group' element={<JoinGroup user={user} />} />
-            <Route path='/create_group' element={<CreateGroup user={user} userChats={userChats} updateChats={updateChats}/>} />
+            <Route path='/create_group' element={<CreateGroup user={user} AvailableChats={AvailableChats} updateChats={updateChats}/>} />
             <Route path='/chat/:chatID' element={<Chat user={user} />} />
             <Route path='*' element={<NotFound />} />
           </Routes>

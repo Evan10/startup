@@ -48,7 +48,7 @@ APIRouter.post("/auth/create", async (req, res)=>{
     if(!passwordStatus.valid){
         const message = `Invalid password. Password must include:\n 
         ${passwordStatus.reasons.map((val,i)=>`${i+1}) ${val}`).join("\n")}`;
-        res.status(401).send({success:false, message:message}).end(); 
+        res.status(400).send({success:false, message:message}).end(); 
         return;
     }
 
@@ -58,7 +58,7 @@ APIRouter.post("/auth/create", async (req, res)=>{
     if (!!success){
         const userToken = await myAuthVerifier.verifyCredentials(username, password);
         if(!userToken){
-            res.status(401).send({success:false,message:"Account was created but you weren't signed in"});
+            res.status(400).send({success:false,message:"Account was created but you weren't signed in"});
         }else{
             res.cookie(TOKEN_NAME,userToken,{
             httpOnly: true,
@@ -68,7 +68,7 @@ APIRouter.post("/auth/create", async (req, res)=>{
             res.send({success:true});
         }
     }else{
-        res.status(401).send({success:false,message:"Account could not be created"});
+        res.status(400).send({success:false,message:"Account could not be created"});
     }
 });
 
@@ -114,7 +114,7 @@ APIRouter.get("/auth/getSelf", checkToken, (req,res)=>{
     res.send({username:user.username, chats:user.chats});
 })
 
-APIRouter.patch("/chat/JoinChat", checkToken, (req, res)=>{
+APIRouter.patch("/chat/JoinChat", (req, res)=>{
     const joinCode = req.body?.joinCode;
     const userToken = req.cookies[TOKEN_NAME];
     const user = myAuthVerifier.getUserWithToken(userToken);

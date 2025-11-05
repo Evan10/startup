@@ -3,14 +3,25 @@ import {useNavigate} from "react-router-dom"
 import "../app.css"
 
 
-export function JoinGroup() {
+export function JoinGroup({user}) {
     const navigate = useNavigate();
 
         const handleFormSubmit = (e) =>{
             e.preventDefault();
             const formData = new FormData(e.target);
-
-            navigate(`/chat/${formData.get("roomCode")}`);
+            const roomCode = formData.get("roomCode");
+            const username = user || formData.get("username");
+            if(!roomCode){
+                alert("Please enter a room code");
+                return
+            }
+            if(!username){
+                alert("Please choose a username or sign in");
+                return;
+            }
+            fetch("/api/chat/JoinChat",{method:"PATCH", 
+                header:{"Content-type":"application/json"},
+                body:JSON.stringify({joinCode:roomCode, username:username})})
         }
 
     return (
@@ -21,7 +32,7 @@ export function JoinGroup() {
                     <form id="login-form" className="form-format" onSubmit={handleFormSubmit}>
                         <div className="form-body d-flex flex-column align-items-center">
                             <input className="form-input-format" name="roomCode" type="text" required placeholder="Enter Room Code" />
-                            <input className="form-input-format" type="text" required placeholder="Choose a name" />
+                            {!user && <input className="form-input-format" name="username" type="text" required placeholder="Choose a name" />}
                             <button type="submit">Join Room</button>
                         </div>
                     </form>
