@@ -24,7 +24,8 @@ export default function App() {
             if(res.ok){return res.json()}else{return false}})
           .then((res)=>{
               updateChats(res);
-          });
+          })
+          .catch(err=>{});
   }; 
 
   useEffect(() => {
@@ -34,7 +35,7 @@ export default function App() {
       if("username" in res){
         updateUser(res.username);
       }
-    });
+    }).catch(err=>{});
   }, []);
 
   useEffect(()=>{

@@ -15,11 +15,6 @@ const myAuthVerifier = new AuthVerifier(myDatabase);
 
 const app = express();
 
-app.use((req,res,next)=>{
-    Object.keys(myDatabase.chats).forEach(console.log)
-    next();
-});
-
 app.use(express.json());
 
 app.use(cookieParser());
@@ -171,6 +166,7 @@ APIRouter.post("/chat/sendMessage", checkToken, (req, res)=>{
     // give the message a new id to stop someone theoretically 
     // manually editing id to cause a double up of ids which would cause error on the front end
     message.id = crypto.randomUUID(); 
+    delete message.state; // state is for front end and websockets
     myDatabase.addChatMessage(user.username,message, chatID);
     res.send(200).end();
 });

@@ -22,9 +22,12 @@ export function Chat({ user, chatId }) {
         headers: { 'content-type': 'application/json' }}) 
       .then((res)=>{if(!res.ok){
         throw new Error("Chat not found");
-      }}).then((res)=>res.json())
+      }else{return res;}}).then((res)=>res.json())
       .then((chat)=>{
         updateTitle(chat.title);
+        chat.messages.forEach(element => {
+          element.state = messageState.Delivered
+        });
         updateMessages(chat.messages);
       }).catch((err)=>{
         alert(err.message);
@@ -39,10 +42,10 @@ export function Chat({ user, chatId }) {
         return [...msgs, messageData]
       });
 
-    fetch("/api/chat/sendMessage", {method:"POST", body:{
+    fetch("/api/chat/sendMessage", {method:"POST",headers:{"Content-Type":"application/json"}, body:JSON.stringify({
       chatID:chatID,
       message:messageData
-    }});
+    })});
 
     setTimeout(()=>{scrollToEnd()},50);
   };

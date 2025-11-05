@@ -77,7 +77,7 @@ export default class testDB{
 
     addChatMessage(username, message, chatID){
         const chat = this.chats[chatID];
-        if(username in chat.users ){chat.messages.push(message);return true}
+        if(chat.users.includes(username) ){chat.messages.push(message);return true}
         return false;
     }
 
