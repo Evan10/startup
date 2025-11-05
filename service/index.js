@@ -100,6 +100,12 @@ APIRouter.delete("/auth/logout", (req, res)=>{
     res.status(200).clearCookie(TOKEN_NAME).send({message:"User successfully signed out"});
 });
 
+APIRouter.get("/auth/getSelf", checkToken, (req,res)=>{
+    const userToken = req.cookies[TOKEN_NAME];
+    const user = myAuthVerifier.getUserWithToken(userToken);
+    res.send({username:user.username, chats:user.chats});
+})
+
 APIRouter.patch("/chat/JoinChat", checkToken, (req, res)=>{
     const joinCode = req.body?.joinCode;
     const userToken = req.cookies[TOKEN_NAME];

@@ -33,7 +33,7 @@ export function Chat({ user, chatId }) {
         alert("Chat not found");
         setTimeout(()=>{navigate("/")}, 3000);
       });
-  }, [chatID]);
+  }, []);
 
 
   const sendMessage = (msg) => {
