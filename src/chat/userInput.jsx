@@ -28,9 +28,9 @@ export function UserInput({onSendMessage, onFileSend}) {
     }
 
 
-    const handleSendFile = (e) => {
+    const handleSendFile = async (e) => {
         const file = e.target.files[0];
-        onFileSend(file.name);
+        await onFileSend(file);
     }
 
     return (

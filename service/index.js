@@ -116,10 +116,18 @@ APIRouter.get("/auth/getSelf", checkToken, (req,res)=>{
 
 APIRouter.patch("/chat/JoinChat", (req, res)=>{
     const joinCode = req.body?.joinCode;
+    const username = req.body?.username;
     const userToken = req.cookies[TOKEN_NAME];
-    const user = myAuthVerifier.getUserWithToken(userToken);
     const chat = myDatabase.getChatWithJoinCode(joinCode);
-    myDatabase.addUserChats(user.username,chat.chatID);
+    if(!userToken){
+        const guestToken = myAuthVerifier.generateGuestToken(username);
+        myDatabase.addUserChats(user.username,chat.chatID);
+    }else{
+        const user = myAuthVerifier.getUserWithToken(userToken);
+        myDatabase.addUserChats(user.username,chat.chatID);
+    }
+    
+    
     res.status(200).end();
 });
 

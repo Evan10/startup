@@ -50,8 +50,17 @@ export function Chat({ user, chatId }) {
     setTimeout(()=>{scrollToEnd()},50);
   };
 
-  const sendFile = (flData) => {
-    const fileMessageData = {type:"file",content:flData, user: user, state:messageState.Sending, id:crypto.randomUUID()}
+  const sendFile = async (flData) => {
+    const formData = new FormData()
+    formData.append("file",flData);
+    const res = awaitfetch("https://0x0.st", {method:'POST',body:formData})
+    res = await res.json();
+    const storageURL = res.text();
+
+    console.log(storageURL);
+
+
+    const fileMessageData = {type:"file",content:flData.name, location: storageURL, user: user, state:messageState.Sending, id:crypto.randomUUID()}
     updateMessages((msgs) => {
       return [...msgs, fileMessageData]
     });
