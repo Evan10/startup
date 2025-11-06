@@ -3,13 +3,14 @@ import "../app.css"
 import "./chat.css"
 import { UserInput } from './userInput';
 import { Message } from './message';
-import { FileMessage } from "./fileMessage"
+import { DogImageMessage } from "./DogImageMessage"
 import messageState from "./messageState"
 import { useParams,useNavigate } from 'react-router-dom';
 
 export function Chat({ user, chatId }) {
   const [messages, updateMessages] = useState([]);
   const [title, updateTitle] = useState("Title Loading...");
+  const [joinCode, updateJoinCode] = useState("");
   const {chatID} = useParams();
   const navigate = useNavigate();
 
@@ -25,6 +26,7 @@ export function Chat({ user, chatId }) {
       }else{return res;}}).then((res)=>res.json())
       .then((chat)=>{
         updateTitle(chat.title);
+        updateJoinCode(chat.joinCode);
         chat.messages.forEach(element => {
           element.state = messageState.Delivered
         });
@@ -33,7 +35,7 @@ export function Chat({ user, chatId }) {
         alert(err.message);
         setTimeout(()=>{navigate("/")}, 3000);
       });
-  }, []);
+  }, [chatID]);
 
 
   const sendMessage = (msg) => {
@@ -50,25 +52,22 @@ export function Chat({ user, chatId }) {
     setTimeout(()=>{scrollToEnd()},50);
   };
 
-  const sendFile = async (flData) => {
-    const formData = new FormData()
-    formData.append("file",flData);
-    const res = awaitfetch("https://0x0.st", {method:'POST',body:formData})
+  const getDogPhoto = async () => {
+    let res = await fetch("https://dog.ceo/api/breeds/image/random");
     res = await res.json();
-    const storageURL = res.text();
-
-    console.log(storageURL);
 
 
-    const fileMessageData = {type:"file",content:flData.name, location: storageURL, user: user, state:messageState.Sending, id:crypto.randomUUID()}
-    updateMessages((msgs) => {
-      return [...msgs, fileMessageData]
-    });
+    const messageData = {type:"image",content:res.message, user: user, state:messageState.Sending, id:crypto.randomUUID()}
     
-    fetch("/api/chat/sendMessage", {method:"POST", body:{
+    updateMessages((msgs) => {
+      return [...msgs, messageData]
+    });
+
+
+    fetch("/api/chat/sendMessage", {method:"POST",headers:{"Content-Type":"application/json"}, body:JSON.stringify({
       chatID:chatID,
-      message:fileMessageData
-    }});
+      message:messageData
+    })});
 
     setTimeout(()=>{scrollToEnd()},50);
   }
@@ -86,13 +85,13 @@ export function Chat({ user, chatId }) {
                   (messages.map((p) => (
                     p.type === "text" ?
                     <Message key={p.id} messageData={p} fromUser={user == p.user} />:
-                    <FileMessage key={p.id} messageData={p} fromUser={user == p.user} />
+                    <DogImageMessage key={p.id} messageData={p} fromUser={user == p.user} />
                   )))
               }
               <div ref={endOfSectionRef}></div>
             </div>
           </div>
-        <UserInput onSendMessage={sendMessage} onFileSend={sendFile}/>
+        <UserInput onSendMessage={sendMessage} getDogPhoto={getDogPhoto}/>
     </div>
   );
 }

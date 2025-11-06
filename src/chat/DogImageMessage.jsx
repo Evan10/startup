@@ -4,16 +4,13 @@ import "./chat.css"
 import messageState from "./messageState"
 import React, { useEffect, useState } from 'react';
 
-export function FileMessage({ messageData, fromUser }) {
+export function DogImageMessage({ messageData, fromUser }) {
     const classAtribs = "message " + ( fromUser ? "from-me" : "from-other")
 
-    const handleFileDownload = () => {
-        console.log("download file from 3rd party source");
-    }
 
     return (<div>
                 <div className={classAtribs}>
-                    <button onClick={handleFileDownload}>Download File</button>
+                    <img src={messageData.content} style={{ maxWidth: "70%", height: "auto" }}></img>
                 </div>
             </div>);
 }
