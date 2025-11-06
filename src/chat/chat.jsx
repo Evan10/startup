@@ -78,6 +78,10 @@ export function Chat({ user, chatId }) {
 
   return (
     <div className="container-fluid text-center">
+      <div className='chat-header'>
+        <h5>{title}</h5>
+        <h6>Join Code: {joinCode}</h6>
+      </div>
         <div id="chat-container">
             <div id="message-container">
               {
