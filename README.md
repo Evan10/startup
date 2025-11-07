@@ -101,12 +101,12 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] **Node.js/Express HTTP service** - I did not complete this part of the deliverable.
-- [ ] **Static middleware for frontend** - I did not complete this part of the deliverable.
-- [ ] **Calls to third party endpoints** - I did not complete this part of the deliverable.
-- [ ] **Backend service endpoints** - I did not complete this part of the deliverable.
-- [ ] **Frontend calls service endpoints** - I did not complete this part of the deliverable.
-- [ ] **Supports registration, login, logout, and restricted endpoint** - I did not complete this part of the deliverable.
+- [X] **Node.js/Express HTTP service** - Using express I set up a custom login and chat implementation
+- [X] **Static middleware for frontend** - There is a static middleware to serve the react page
+- [X] **Calls to third party endpoints** - Calls a third party service to get dog pictures
+- [X] **Backend service endpoints** - User can query backend to log in send chat messages and more
+- [X] **Frontend calls service endpoints** - The front end used fetch to hit all backend points
+- [X] **Supports registration, login, logout, and restricted endpoint** - Users can log in and out and register, there are several endpoints that the user can not reach including creating a new chat unless they have an account
 
 
 ## 🚀 DB deliverable
