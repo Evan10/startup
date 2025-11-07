@@ -2,13 +2,13 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import bcrypt from "bcrypt"
 
-import testDB from "./Database/testDB.js"; // eventually replace with db connection
-import AuthVerifier from "./Auth/verifyAuth.js";
-import validPassword from "./Auth/verifyValidPassword.js";
+import testDB from "./testDB.js"; // eventually replace with db connection
+import AuthVerifier from "./verifyAuth.js";
+import validPassword from "./verifyValidPassword.js";
 import {TOKEN_NAME,GUEST_TOKEN_NAME, USERNAME} from "./consts.js"
 import {generateRandomString} from "./Util.js";
 
-const port = 3000;
+const port = process.argv.length > 2 ? process.argv[2] : 3000;
 
 const myDatabase = new testDB({dbUsername:"test", dbPassword:"test"});
 const myAuthVerifier = new AuthVerifier(myDatabase);
