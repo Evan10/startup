@@ -44,6 +44,10 @@ export default class verifyAuth{
         this.guestTokens[token] = guestName;
         return token;
     }
+    getGuestName(token){
+        return this.guestTokens[token];
+    }
+
     verifyGuestToken(token){
         return this.guestTokens.hasOwnProperty(token);
     }

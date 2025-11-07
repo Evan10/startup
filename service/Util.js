@@ -1,11 +1,10 @@
 
+const DEFAULT_CHARS = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890";
 
-
-export function generateJoinCode(length = 6){
-    const CHARS = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890";
-    let code = "";
+export function generateRandomString(length = 6, CHARS = DEFAULT_CHARS){
+    let str = "";
     while(code.length < length){
-        code+=CHARS.at(Math.floor(Math.random()*CHARS.length));
+        str+=CHARS.at(Math.floor(Math.random()*CHARS.length));
     }
-    return code;
+    return str;
 }

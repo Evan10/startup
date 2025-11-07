@@ -27,10 +27,16 @@ export default class testDB{
         return user;
     }
 
+    addGuestUserToChat(username,chatID){
+        this.chats[chatID].users?.push(username);
+    }
+
     addUsertoChat(username, chatID){
-        if(!this.users[username]?.chats.includes(chatID))
-            this.users[username]?.chats?.push(chatID);
+        const user = this.getUser(username);
+        if(!user.chats.includes(chatID)){
+            user.chats.push(chatID);
             this.chats[chatID].users?.push(username);
+        }
     }
     removeUserChat(username, chatID){
         const idx = this.users[username]?.chats?.indexOf(chatID);

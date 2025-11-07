@@ -5,8 +5,8 @@ import bcrypt from "bcrypt"
 import testDB from "./Database/testDB.js"; // eventually replace with db connection
 import AuthVerifier from "./Auth/verifyAuth.js";
 import validPassword from "./Auth/verifyValidPassword.js";
-import {TOKEN_NAME, USERNAME} from "./consts.js"
-import {generateJoinCode} from "./Util.js";
+import {TOKEN_NAME,GUEST_TOKEN_NAME, USERNAME} from "./consts.js"
+import {generateRandomString} from "./Util.js";
 
 const port = 3000;
 
@@ -24,17 +24,30 @@ app.use(express.static('public'));
 const APIRouter = express.Router();
 app.use("/api", APIRouter);
 
-const checkToken = (req, res, next) => {
+const checkToken =(allowGuestToken)=>{ return (req, res, next) => {
     const userToken = req.cookies[TOKEN_NAME];
     if(!userToken){
+        if(allowGuestToken){
+        const guestToken = req.cookies[GUEST_TOKEN_NAME];
+        if(!guestToken || !myAuthVerifier.verifyGuestToken(guestToken)){
+            res.status(401).send({message:"Missing credentials, try signing in again."});
+            return;
+        }else{
+            next();
+            return;
+        }
+    }else {
         res.status(401).send({message:"Missing credentials, try signing in again."});
+        return;
+    }
+
     }else if(!myAuthVerifier.verifySessionToken(userToken)){
         res.status(401).send({message:"Incorrect token, try signing in again."});
     }else{
         next();
     }
 
-}
+}};
 
 APIRouter.post("/auth/create", async (req, res)=>{
     const username = req.body?.username, password = req.body?.password;
@@ -100,7 +113,7 @@ APIRouter.delete("/auth/logout", (req, res)=>{
     res.status(200).clearCookie(TOKEN_NAME).send({message:"User successfully signed out"});
 });
 
-APIRouter.get("/auth/getSelf", checkToken, (req,res)=>{
+APIRouter.get("/auth/getSelf", checkToken(false), (req,res)=>{
     const userToken = req.cookies[TOKEN_NAME];
     if(!userToken){
         res.send({});
@@ -116,32 +129,41 @@ APIRouter.get("/auth/getSelf", checkToken, (req,res)=>{
 
 APIRouter.patch("/chat/JoinChat", (req, res)=>{
     const joinCode = req.body?.joinCode;
-    const username = req.body?.username;
+    let username = req.body?.username;
     const userToken = req.cookies[TOKEN_NAME];
     const chat = myDatabase.getChatWithJoinCode(joinCode);
     if(!userToken){
-        const guestToken = myAuthVerifier.generateGuestToken(username);
-        myDatabase.addUserChats(user.username,chat.chatID);
+        let guestToken = req.cookies[GUEST_TOKEN_NAME];
+        if(!guestToken){
+            guestToken = myAuthVerifier.generateGuestToken(username);
+            res.cookie(GUEST_TOKEN_NAME, guestToken, {httpOnly:true,
+                secure:true,
+                maxAge: 1000 * 60 * 60 * 24 * 7
+            });
+        }
+        username = `${username}#${generateRandomString(6,"0123456789")}`;
+
+        myDatabase.addGuestUserToChat(username,chat.chatID);
     }else{
         const user = myAuthVerifier.getUserWithToken(userToken);
         myDatabase.addUsertoChat(user.username,chat.chatID);
     }
     
-    res.status(200).send({chatID:chat.chatID}).end();
+    res.status(200).send({chatID:chat.chatID, title:chat.title, guestUsername:username}).end();
 });
 
-APIRouter.post("/chat/createChat", checkToken, (req, res)=>{
+APIRouter.post("/chat/createChat", checkToken(false), (req, res)=>{
     const title = req.body?.title;
     const chatID = crypto.randomUUID();
     const userToken = req.cookies[TOKEN_NAME];
     const user = myAuthVerifier.getUserWithToken(userToken);
-    const chatJoinCode = generateJoinCode();
+    const chatJoinCode = generateRandomString();
     const chat = myDatabase.createNewChat(title,chatID,user,chatJoinCode);
     res.send({chatID:chatID});
 });
 
 
-APIRouter.get("/chat/getUserChats", checkToken, (req, res)=>{
+APIRouter.get("/chat/getUserChats", checkToken(false), (req, res)=>{
     const userToken = req.cookies[TOKEN_NAME];
     const user = myAuthVerifier.getUserWithToken(userToken); 
     const allChats = myDatabase.getUserChats(user.username);
@@ -150,23 +172,42 @@ APIRouter.get("/chat/getUserChats", checkToken, (req, res)=>{
     res.status(200).send(chats);
 });
 
-APIRouter.get("/chat/getChat", checkToken, (req, res)=>{
+APIRouter.get("/chat/getChat", checkToken(true), (req, res)=>{
     const chatID = req.query?.chatID;
     const isGuest = req.query?.isGuest;
-    const userToken = req.cookies[TOKEN_NAME];
-    const user = myAuthVerifier.getUserWithToken(userToken); 
     const chat = myDatabase.getChatWithID(chatID);
     if(!chat){res.status(400).end();return;}
-    if(!(chat.users.includes(user.username))){
+
+    let username = "";
+    if(isGuest){
+        const guestUserToken = req.cookies[GUEST_TOKEN_NAME];
+        const username = myAuthVerifier.getGuestName(guestUserToken); 
+    }else{
+        const userToken = req.cookies[TOKEN_NAME];
+        const user = myAuthVerifier.getUserWithToken(userToken); 
+        username = user.username;
+    }
+    
+    
+    if(!(chat.users.includes(username))){
         res.status(401).end();
         return;
     }
     res.status(200).send(chat);
 });
 
-APIRouter.post("/chat/sendMessage", checkToken, (req, res)=>{
+APIRouter.post("/chat/sendMessage", checkToken(true), (req, res)=>{
+
     const userToken = req.cookies[TOKEN_NAME];
     const user = myAuthVerifier.getUserWithToken(userToken);
+    if(!userToken){
+        const guestToken = req.cookies[GUEST_TOKEN_NAME];
+        if(!guestToken){
+            res.status(401).end();
+            return;
+        }
+    }
+
     const chatID = req.body?.chatID;
     const message = req.body?.message;
     message.createdOn = new Date().toUTCString();

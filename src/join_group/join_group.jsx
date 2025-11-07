@@ -27,7 +27,7 @@ export function JoinGroup({user, updateChats}) {
             if(!res?.chatID){
                 return;
             }
-            updateChats((chats)=>[...chats, res.chatID]);
+            updateChats((chats)=>[...chats, {chatID:res.chatID, title:res.title}]);
             navigate(`/chat/${res.chatID}`);
         }
 
