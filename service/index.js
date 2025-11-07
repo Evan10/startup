@@ -124,11 +124,10 @@ APIRouter.patch("/chat/JoinChat", (req, res)=>{
         myDatabase.addUserChats(user.username,chat.chatID);
     }else{
         const user = myAuthVerifier.getUserWithToken(userToken);
-        myDatabase.addUserChats(user.username,chat.chatID);
+        myDatabase.addUsertoChat(user.username,chat.chatID);
     }
     
-    
-    res.status(200).end();
+    res.status(200).send({chatID:chat.chatID}).end();
 });
 
 APIRouter.post("/chat/createChat", checkToken, (req, res)=>{

@@ -3,10 +3,10 @@ import {useNavigate} from "react-router-dom"
 import "../app.css"
 
 
-export function JoinGroup({user}) {
+export function JoinGroup({user, updateChats}) {
     const navigate = useNavigate();
 
-        const handleFormSubmit = (e) =>{
+        const handleFormSubmit = async (e) =>{
             e.preventDefault();
             const formData = new FormData(e.target);
             const roomCode = formData.get("roomCode");
@@ -19,9 +19,16 @@ export function JoinGroup({user}) {
                 alert("Please choose a username or sign in");
                 return;
             }
-            fetch("/api/chat/JoinChat",{method:"PATCH", 
-                header:{"Content-type":"application/json"},
-                body:JSON.stringify({joinCode:roomCode, username:username})})
+            let res = await fetch("/api/chat/JoinChat",{method:"PATCH", 
+                headers:{"Content-type":"application/json"},
+                body:JSON.stringify({joinCode:roomCode, username:username})});
+
+            res = await res.json();
+            if(!res?.chatID){
+                return;
+            }
+            updateChats((chats)=>[...chats, res.chatID]);
+            navigate(`/chat/${res.chatID}`);
         }
 
     return (
