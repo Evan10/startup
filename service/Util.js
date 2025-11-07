@@ -3,7 +3,7 @@ const DEFAULT_CHARS = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM12345
 
 export function generateRandomString(length = 6, CHARS = DEFAULT_CHARS){
     let str = "";
-    while(code.length < length){
+    while(str.length < length){
         str+=CHARS.at(Math.floor(Math.random()*CHARS.length));
     }
     return str;

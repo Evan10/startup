@@ -23,8 +23,11 @@ export default function App() {
           .then((res)=>{
             if(res.ok){return res.json()}else{return false}})
           .then((res)=>{
-              updateChats(res);
-          })
+          if(!res){
+            updateChats([]);
+          }else{
+            updateChats(res);
+          }})
           .catch(err=>{});
   }; 
 

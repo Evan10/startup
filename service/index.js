@@ -57,7 +57,6 @@ APIRouter.post("/auth/create", async (req, res)=>{
     }
 
     const passwordStatus = validPassword(password);
-    console.log(passwordStatus);
     if(!passwordStatus.valid){
         const message = `Invalid password. Password must include:\n 
         ${passwordStatus.reasons.map((val,i)=>`${i+1}) ${val}`).join("\n")}`;
@@ -133,16 +132,13 @@ APIRouter.patch("/chat/JoinChat", (req, res)=>{
     const userToken = req.cookies[TOKEN_NAME];
     const chat = myDatabase.getChatWithJoinCode(joinCode);
     if(!userToken){
-        let guestToken = req.cookies[GUEST_TOKEN_NAME];
-        if(!guestToken){
-            guestToken = myAuthVerifier.generateGuestToken(username);
-            res.cookie(GUEST_TOKEN_NAME, guestToken, {httpOnly:true,
-                secure:true,
-                maxAge: 1000 * 60 * 60 * 24 * 7
-            });
-        }
         username = `${username}#${generateRandomString(6,"0123456789")}`;
-
+        const guestToken = myAuthVerifier.generateGuestToken(username);
+        res.cookie(GUEST_TOKEN_NAME, guestToken, {
+            httpOnly:true,
+            secure:true,
+            maxAge: 1000 * 60 * 60 * 24 * 7
+        });
         myDatabase.addGuestUserToChat(username,chat.chatID);
     }else{
         const user = myAuthVerifier.getUserWithToken(userToken);
@@ -174,14 +170,14 @@ APIRouter.get("/chat/getUserChats", checkToken(false), (req, res)=>{
 
 APIRouter.get("/chat/getChat", checkToken(true), (req, res)=>{
     const chatID = req.query?.chatID;
-    const isGuest = req.query?.isGuest;
+    const isGuest = req.query?.isGuest  === "true";
     const chat = myDatabase.getChatWithID(chatID);
     if(!chat){res.status(400).end();return;}
 
     let username = "";
     if(isGuest){
         const guestUserToken = req.cookies[GUEST_TOKEN_NAME];
-        const username = myAuthVerifier.getGuestName(guestUserToken); 
+        username = myAuthVerifier.getGuestName(guestUserToken); 
     }else{
         const userToken = req.cookies[TOKEN_NAME];
         const user = myAuthVerifier.getUserWithToken(userToken); 
@@ -200,13 +196,6 @@ APIRouter.post("/chat/sendMessage", checkToken(true), (req, res)=>{
 
     const userToken = req.cookies[TOKEN_NAME];
     const user = myAuthVerifier.getUserWithToken(userToken);
-    if(!userToken){
-        const guestToken = req.cookies[GUEST_TOKEN_NAME];
-        if(!guestToken){
-            res.status(401).end();
-            return;
-        }
-    }
 
     const chatID = req.body?.chatID;
     const message = req.body?.message;
@@ -215,7 +204,20 @@ APIRouter.post("/chat/sendMessage", checkToken(true), (req, res)=>{
     // manually editing id to cause a double up of ids which would cause error on the front end
     message.id = crypto.randomUUID(); 
     delete message.state; // state is for front end and websockets
-    myDatabase.addChatMessage(user.username,message, chatID);
+
+    if(!userToken){
+        const guestToken = req.cookies[GUEST_TOKEN_NAME];
+        if(!guestToken){
+            res.status(401).end();
+            return;
+        }
+        const guestName = myAuthVerifier.getGuestName(guestToken);
+        message.username = guestName;
+        myDatabase.addChatMessage(guestName,message, chatID);
+    }else{
+        myDatabase.addChatMessage(user.username,message, chatID);
+        
+    }
     res.send(200).end();
 });
 

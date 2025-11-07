@@ -18,12 +18,14 @@ export function Chat({ user, chatId }) {
 
   useEffect(() => { 
     console.log(chatID)
-    fetch(`/api/chat/getChat?chatID=${chatID}&isGuest=!${!user}`,{
+    fetch(`/api/chat/getChat?chatID=${chatID}&isGuest=${!user}`,{
         method:'GET',
-        headers: { 'content-type': 'application/json' }}) 
-      .then((res)=>{if(!res.ok){
-        throw new Error("Chat not found");
-      }else{return res;}}).then((res)=>res.json())
+        headers: { 'Content-Type': 'application/json' }}) 
+      .then((res)=>{
+        if(!res.ok){
+          throw new Error("Chat not found");
+        }
+        return res.json()})
       .then((chat)=>{
         updateTitle(chat.title);
         updateJoinCode(chat.joinCode);
