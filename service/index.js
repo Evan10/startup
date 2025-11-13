@@ -114,13 +114,13 @@ APIRouter.delete("/auth/logout", (req, res)=>{
     res.status(200).clearCookie(TOKEN_NAME).send({message:"User successfully signed out"});
 });
 
-APIRouter.get("/auth/getSelf", checkToken(false), (req,res)=>{
+APIRouter.get("/auth/getSelf", checkToken(false), async (req,res)=>{
     const userToken = req.cookies[TOKEN_NAME];
     if(!userToken){
         res.send({});
         return
     }
-    const user = myAuthVerifier.getUserWithToken(userToken);
+    const user = await myAuthVerifier.getUserWithToken(userToken);
     if(!user){
         res.send({});
         return;
@@ -143,7 +143,7 @@ APIRouter.patch("/chat/JoinChat", async (req, res)=>{
         });
         await myDatabase.addGuestUserToChat(username,chat.chatID);
     }else{
-        const user = myAuthVerifier.getUserWithToken(userToken);
+        const user = await myAuthVerifier.getUserWithToken(userToken);
         await myDatabase.addUsertoChat(user.username,chat.chatID);
     }
     
@@ -154,21 +154,20 @@ APIRouter.post("/chat/createChat", checkToken(false), async (req, res)=>{
     const title = req.body?.title;
     const chatID = crypto.randomUUID();
     const userToken = req.cookies[TOKEN_NAME];
-    const user = myAuthVerifier.getUserWithToken(userToken);
+    const user = await myAuthVerifier.getUserWithToken(userToken);
     const chatJoinCode = generateRandomString();
-    const chat = await myDatabase.createNewChat(title,chatID,user,chatJoinCode);
+    await myDatabase.createNewChat(title,chatID,user,chatJoinCode);
     res.send({chatID:chatID});
 });
 
 
 APIRouter.get("/chat/getUserChats", checkToken(false),async (req, res)=>{
     const userToken = req.cookies[TOKEN_NAME];
-    const user = myAuthVerifier.getUserWithToken(userToken); 
-    const allChats = await myDatabase.getUserChats(user.username);
+    const user = await myAuthVerifier.getUserWithToken(userToken); 
+    const allChatIDs = await myDatabase.getUserChats(user.username);
+    const allChats = await myDatabase.getManyChatTitlesWithIDs(allChatIDs);
     if(!allChats){res.status(200).send({}).end();return;}
-    const title = await myDatabase.getChatWithID(id).title;
-    const chats = allChats.map((id)=>{return {chatID:id,title: title}});
-    res.status(200).send(chats);
+    res.status(200).send(allChats);
 });
 
 APIRouter.get("/chat/getChat", checkToken(true), async (req, res)=>{
@@ -183,7 +182,7 @@ APIRouter.get("/chat/getChat", checkToken(true), async (req, res)=>{
         username = myAuthVerifier.getGuestName(guestUserToken); 
     }else{
         const userToken = req.cookies[TOKEN_NAME];
-        const user = myAuthVerifier.getUserWithToken(userToken); 
+        const user = await myAuthVerifier.getUserWithToken(userToken); 
         username = user.username;
     }
     
@@ -198,7 +197,7 @@ APIRouter.get("/chat/getChat", checkToken(true), async (req, res)=>{
 APIRouter.post("/chat/sendMessage", checkToken(true), async (req, res)=>{
 
     const userToken = req.cookies[TOKEN_NAME];
-    const user = myAuthVerifier.getUserWithToken(userToken);
+    const user = await myAuthVerifier.getUserWithToken(userToken);
 
     const chatID = req.body?.chatID;
     const message = req.body?.message;

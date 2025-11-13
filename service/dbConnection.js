@@ -60,20 +60,22 @@ export default class dbConnection{
     }
     
     async getUserChats(username){
-        return (await this.users.findOne({username:username})).chats;
+        const user = await this.users.findOne({username:username});
+        return user?.chats;
     }
+
 
     async getPasswordHash(username){
         return (await this.users.findOne({username:username})).passwordHash;
     }
 
     async getJoinCodes(){   
-        return await this.joinCodes.findOne({_id:JOIN_CODE_ARRAY_ID}).joinCodes;
+        return await this.joinCodes.findOne({_id:this.JOIN_CODE_ARRAY_ID}).joinCodes;
     }
 
     async createNewChat(chatName, chatID, user, joinCode){
         const chat = {owner:user.username, chatID:chatID, joinCode:joinCode, title:chatName, messages:[], users:[user.username]};
-        await this.joinCodes.updateOne({_id:JOIN_CODE_ARRAY_ID},{$push:{joinCodes : joinCode}})
+        await this.joinCodes.updateOne({_id:this.JOIN_CODE_ARRAY_ID},{$push:{joinCodes : joinCode}}, { upsert: true } )
         await this.chats.insertOne(chat);
         await this.users.updateOne({username:user.username}, {$addToSet : {chats: chatID}});
         return chatID;
@@ -81,6 +83,11 @@ export default class dbConnection{
 
     async getChatWithID(chatID){
         return await this.chats.findOne({chatID:chatID});
+    }
+
+    
+    async getManyChatTitlesWithIDs(chatIDs){
+        return await this.chats.find({chatID :{$in: chatIDs }}, {projection : {chatID:1, title: 1, _id:0}}).toArray();
     }
 
     async getChatWithJoinCode(joinCode){
@@ -105,7 +112,7 @@ export default class dbConnection{
     }
 
     async #removeJoinCode(joinCode){
-        await this.joinCodes.updateOne({_id:JOIN_CODE_ARRAY_ID}, {$pull:{joinCodes : joinCode}})
+        await this.joinCodes.updateOne({_id:this.JOIN_CODE_ARRAY_ID}, {$pull:{joinCodes : joinCode}})
     }
 
 }
