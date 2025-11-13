@@ -98,12 +98,14 @@ export default class dbConnection{
     }
 
     async deleteChat(username, chatID){
-        const result = await this.chats.deleteOne({chatID:chatID, owner:username});
-        return result.modifiedCount != 0;
+        const chat = await this.chats.findOneAndDelete({chatID:chatID, owner:username});
+        if(!chat) return false;
+        await this.#removeJoinCode(chat.joinCode);
+        return true;
     }
 
     async #removeJoinCode(joinCode){
-
+        await this.joinCodes.updateOne({_id:JOIN_CODE_ARRAY_ID}, {$pull:{joinCodes : joinCode}})
     }
 
 }
