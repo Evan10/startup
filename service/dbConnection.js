@@ -1,7 +1,7 @@
 import { MongoClient } from mongodb;
 
 export default class dbConnection{
-
+    JOIN_CODE_ARRAY_ID = "joinCodes";
 
     async testConnection(db){
         try {
@@ -68,31 +68,38 @@ export default class dbConnection{
     }
 
     async getJoinCodes(){   
-        return await this.joinCodes.find();
+        return await this.joinCodes.findOne({_id:JOIN_CODE_ARRAY_ID}).joinCodes;
     }
 
     async createNewChat(chatName, chatID, user, joinCode){
-        
+        const chat = {owner:user.username, chatID:chatID, joinCode:joinCode, title:chatName, messages:[], users:[user.username]};
+        await this.joinCodes.updateOne({_id:JOIN_CODE_ARRAY_ID},{$push:{joinCodes : joinCode}})
+        await this.chats.insertOne(chat);
+        await this.users.updateOne({username:user.username}, {$addToSet : {chats: chatID}});
+        return chatID;
     }
 
     async getChatWithID(chatID){
-
+        return await this.chats.findOne({chatID:chatID});
     }
 
     async getChatWithJoinCode(joinCode){
-
+        return await this.chats.findOne({joinCode:joinCode});
     }
 
     async updateChatData(chatID, chatData){
-
+        await this.chats.replaceOne({chatID:chatID}, chatData);
+        return true;
     }
 
     async addChatMessage(username, message, chatID){
-
+        const result = await this.chats.updateOne({chatID:chatID, users:username}, {$push:{messages:message}});
+        return result.modifiedCount != 0;
     }
 
     async deleteChat(username, chatID){
-
+        const result = await this.chats.deleteOne({chatID:chatID, owner:username});
+        return result.modifiedCount != 0;
     }
 
     async #removeJoinCode(joinCode){
