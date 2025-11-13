@@ -67,7 +67,7 @@ APIRouter.post("/auth/create", async (req, res)=>{
     }
 
     const pwhash = await bcrypt.hash(password, 10);
-    const success = myDatabase.createNewUser(username, pwhash);
+    const success = await myDatabase.createNewUser(username, pwhash);
 
     if (!!success){
         const userToken = await myAuthVerifier.verifyCredentials(username, password);
@@ -128,11 +128,11 @@ APIRouter.get("/auth/getSelf", checkToken(false), (req,res)=>{
     res.send({username:user.username, chats:user.chats});
 })
 
-APIRouter.patch("/chat/JoinChat", (req, res)=>{
+APIRouter.patch("/chat/JoinChat", async (req, res)=>{
     const joinCode = req.body?.joinCode;
     let username = req.body?.username;
     const userToken = req.cookies[TOKEN_NAME];
-    const chat = myDatabase.getChatWithJoinCode(joinCode);
+    const chat = await myDatabase.getChatWithJoinCode(joinCode);
     if(!userToken){
         username = `${username}#${generateRandomString(6,"0123456789")}`;
         const guestToken = myAuthVerifier.generateGuestToken(username);
@@ -141,39 +141,40 @@ APIRouter.patch("/chat/JoinChat", (req, res)=>{
             secure:true,
             maxAge: 1000 * 60 * 60 * 24 * 7
         });
-        myDatabase.addGuestUserToChat(username,chat.chatID);
+        await myDatabase.addGuestUserToChat(username,chat.chatID);
     }else{
         const user = myAuthVerifier.getUserWithToken(userToken);
-        myDatabase.addUsertoChat(user.username,chat.chatID);
+        await myDatabase.addUsertoChat(user.username,chat.chatID);
     }
     
     res.status(200).send({chatID:chat.chatID, title:chat.title, guestUsername:username}).end();
 });
 
-APIRouter.post("/chat/createChat", checkToken(false), (req, res)=>{
+APIRouter.post("/chat/createChat", checkToken(false), async (req, res)=>{
     const title = req.body?.title;
     const chatID = crypto.randomUUID();
     const userToken = req.cookies[TOKEN_NAME];
     const user = myAuthVerifier.getUserWithToken(userToken);
     const chatJoinCode = generateRandomString();
-    const chat = myDatabase.createNewChat(title,chatID,user,chatJoinCode);
+    const chat = await myDatabase.createNewChat(title,chatID,user,chatJoinCode);
     res.send({chatID:chatID});
 });
 
 
-APIRouter.get("/chat/getUserChats", checkToken(false), (req, res)=>{
+APIRouter.get("/chat/getUserChats", checkToken(false),async (req, res)=>{
     const userToken = req.cookies[TOKEN_NAME];
     const user = myAuthVerifier.getUserWithToken(userToken); 
-    const allChats = myDatabase.getUserChats(user.username);
+    const allChats = await myDatabase.getUserChats(user.username);
     if(!allChats){res.status(200).send({}).end();return;}
-    const chats = allChats.map((id)=>{return {chatID:id,title:myDatabase.getChatWithID(id).title}})
+    const title = await myDatabase.getChatWithID(id).title;
+    const chats = allChats.map((id)=>{return {chatID:id,title: title}});
     res.status(200).send(chats);
 });
 
-APIRouter.get("/chat/getChat", checkToken(true), (req, res)=>{
+APIRouter.get("/chat/getChat", checkToken(true), async (req, res)=>{
     const chatID = req.query?.chatID;
     const isGuest = req.query?.isGuest  === "true";
-    const chat = myDatabase.getChatWithID(chatID);
+    const chat = await myDatabase.getChatWithID(chatID);
     if(!chat){res.status(400).end();return;}
 
     let username = "";
@@ -194,7 +195,7 @@ APIRouter.get("/chat/getChat", checkToken(true), (req, res)=>{
     res.status(200).send(chat);
 });
 
-APIRouter.post("/chat/sendMessage", checkToken(true), (req, res)=>{
+APIRouter.post("/chat/sendMessage", checkToken(true), async (req, res)=>{
 
     const userToken = req.cookies[TOKEN_NAME];
     const user = myAuthVerifier.getUserWithToken(userToken);
@@ -215,9 +216,9 @@ APIRouter.post("/chat/sendMessage", checkToken(true), (req, res)=>{
         }
         const guestName = myAuthVerifier.getGuestName(guestToken);
         message.username = guestName;
-        myDatabase.addChatMessage(guestName,message, chatID);
+        await myDatabase.addChatMessage(guestName,message, chatID);
     }else{
-        myDatabase.addChatMessage(user.username,message, chatID);
+        await myDatabase.addChatMessage(user.username,message, chatID);
         
     }
     res.send(200).end();

@@ -9,7 +9,7 @@ export default class verifyAuth{
     }
 
     async verifyCredentials(username,password){
-        const pwHash = this.dbConnecion.getPasswordHash(username);
+        const pwHash = await this.dbConnecion.getPasswordHash(username);
         if(!pwHash) return false;
         const isValid = await bcrypt.compare(password, pwHash);
         if(isValid){
@@ -30,9 +30,9 @@ export default class verifyAuth{
         return this.sessionTokens.hasOwnProperty(token);
     }
 
-    getUserWithToken(token){
+    async getUserWithToken(token){
         const username = this.sessionTokens[token];
-        return this.dbConnecion.getUser(username);
+        return await this.dbConnecion.getUser(username);
     }
 
     endSession(token){
