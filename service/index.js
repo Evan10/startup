@@ -8,7 +8,7 @@ import validPassword from "./verifyValidPassword.js";
 import {TOKEN_NAME,GUEST_TOKEN_NAME, USERNAME} from "./consts.js"
 import {generateRandomString} from "./Util.js";
 
-import dbConfig from "./dbConfig.json";
+import dbConfig from "./dbConfig.json" with { type: "json" };;
 
 const port = process.argv.length > 2 ? process.argv[2] : 3000;
 

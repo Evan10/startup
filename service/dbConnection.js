@@ -1,4 +1,4 @@
-import { MongoClient } from mongodb;
+import { MongoClient } from "mongodb";
 
 export default class dbConnection{
     JOIN_CODE_ARRAY_ID = "joinCodes";
@@ -17,7 +17,7 @@ export default class dbConnection{
         this.credentials = credentials;
         this.url = `mongodb+srv://${credentials.userName}:${credentials.password}@${credentials.hostname}`;
         this.client = new MongoClient(this.url);
-        this.db = client.db('WorkCirle');
+        this.db = this.client.db('WorkCirle');
         this.testConnection(this.db);
 
         this.users = this.db.collection("users");
