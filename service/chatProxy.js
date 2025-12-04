@@ -20,7 +20,8 @@ export default class chatProxy{
     proxySetup(){
         
         this.server.on("upgrade", (req, socket, head)=>{
-
+            const cookies = req.headers.cookie || "";
+            
 
 
             this.wss.handleUpgrade(req, socket, head,()=>{
@@ -38,16 +39,26 @@ export default class chatProxy{
                     e.close();
                 }
             });
+
+            this.users = Object.fromEntries(
+                Object.entries(this.users).filter(([key, val]) => !val.closed)
+            );
+
         },10*1000);
     }
 
-
+    changeCurrentUserChat(u, chatID){
+        if(chatID!= null)
+            this.chats[chatID].addUser(u);
+    }
 
 }
 
 class chatRoom {
 
-    constructor(){
+    constructor(chatID, proxy){
+        this.chatID = chatID;
+        this.proxy = proxy;
         this.users = [];    
     }
 
@@ -60,7 +71,30 @@ class chatRoom {
     }
 
     onMessage(sender, message){
+        const type = message?.type | "";
+        switch(type){
+            case TYPE_MESSAGE:
+                this.sendMessageToOthers(sender,message);
+                break;
+            case TYPE_CONNECT_TO_CHAT:
+                const rmIdx =this.users.indexOf(sender);
+                if(rmIdx!=-1) this.users.splice(rmIdx,1);
+                this.proxy.changeCurrentUserChat(sender, message.chatID);
+                break;
+            case TYPE_DISCONNECT:
+                sender.close();
+                const rmIdx2 =this.users.indexOf(sender);
+                if(rmIdx2!=-1) this.users.splice(rmIdx2,1);
+                break;
+            default:
+                console.log("Unknown Message Type");
+        }
 
+    }
+
+
+    addUser(u){
+        this.users.push(u);
     }
 
 }
@@ -96,7 +130,6 @@ class user{
                 const msg = JSON.parse(message.toString());
                 if(msg?.type == TYPE_PONG){
                     renewLastContact();
-
                 }
             }catch(e){
                 console.error("invalid JSON message", e);
