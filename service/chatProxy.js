@@ -12,8 +12,13 @@ export default class chatProxy{
     constructor(httpServer){
         this.server = httpServer;
         this.wss = new WebSocketServer(this.server);
+        this.chats = {};
+        this.users = {};
+        this.userTimeoutInterval = null;
+        proxySetup();
     }
     proxySetup(){
+        
         this.server.on("upgrade", (req, socket, head)=>{
 
 
@@ -23,8 +28,18 @@ export default class chatProxy{
             })
         })
 
+        setupCheckTimeOut();
     }
 
+    setupCheckTimeOut(){
+        this.userTimeoutInterval = setInterval(()=>{
+            Object.values(this.users).forEach(e => {
+                if(e.isTimedOut()){
+                    e.close();
+                }
+            });
+        },10*1000);
+    }
 
 
 
@@ -44,7 +59,7 @@ class chatRoom {
         }
     }
 
-    onMessage(message){
+    onMessage(sender, message){
 
     }
 
@@ -55,14 +70,14 @@ class user{
 
     PING_MESSAGE = `{"type":"${TYPE_PING}"}`;
 
-    constructor(webSocket, token, chat = null){
+    constructor(webSocket, userID, chat = null){
         this.webSocket = webSocket;
-        this.token = token;
+        this.userID = userID;
         this.chat = chat;
         this.recieveMessage = null;
         this.pingInterval = null;
         this.lastContact = now();
-        
+        this.closed = false;
         if(chat!=null){
             addHook();
         }
@@ -109,7 +124,7 @@ class user{
             try{
                 const msg = JSON.parse(message.toString());
                 if(msg?.type != TYPE_PONG){
-                    this.chat.onMessage(msg);
+                    this.chat.onMessage(this, msg);
                 }
             }catch(e){
                 console.error("invalid JSON message", e);
@@ -130,7 +145,9 @@ class user{
 
     close(){
         removeHook();
-        this.webSocket.close()
+        clearInterval(this.pingInterval);
+        this.webSocket.close();
+        this.closed = true;
     }
 
 }
