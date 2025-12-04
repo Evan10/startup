@@ -1,4 +1,5 @@
 import {WebSocketServer} from "ws";
+import cookie from "cookie";
 
 const TYPE_MESSAGE = "message";
 const TYPE_CONNECT_TO_CHAT = "connect"
@@ -9,24 +10,44 @@ const TYPE_PONG = "pong";
 
 export default class chatProxy{
 
-    constructor(httpServer){
+    constructor(httpServer, authHandler, dbConnection){
         this.server = httpServer;
+        this.authHandler = authHandler;
+        this.dbConnection = dbConnection;
         this.wss = new WebSocketServer(this.server);
         this.chats = {};
         this.users = {};
         this.userTimeoutInterval = null;
+        
         proxySetup();
     }
     proxySetup(){
         
-        this.server.on("upgrade", (req, socket, head)=>{
-            const cookies = req.headers.cookie || "";
-            
+        this.server.on("upgrade", async (req, socket, head)=>{
+            let cookies = req.headers.cookie || "";
+            cookies = cookie.parse(cookie);
+            const userID = "";
+
+            if(TOKEN_NAME in cookies){
+                if(!this.authHandler.verifySessionToken(TOKEN_NAME)){
+                    socket.destroy();
+                    return;
+                }
+                const client = await this.authHandler.getUserWithToken(TOKEN_NAME);
+
+
+            }else if(GUEST_TOKEN_NAME in cookies){
+
+
+            }else{
+                socket.destroy();
+                return;
+            }
 
 
             this.wss.handleUpgrade(req, socket, head,()=>{
                 wss.emit("connection", ws, req);
-            })
+            });
         })
 
         setupCheckTimeOut();
@@ -50,6 +71,11 @@ export default class chatProxy{
     changeCurrentUserChat(u, chatID){
         if(chatID!= null)
             this.chats[chatID].addUser(u);
+        else{
+            const c = new chatRoom(chatID, this);
+            c.addUser(u);
+            this.chats[chatID] = c;
+        }
     }
 
 }
@@ -104,10 +130,11 @@ class user{
 
     PING_MESSAGE = `{"type":"${TYPE_PING}"}`;
 
-    constructor(webSocket, userID, chat = null){
+    constructor(webSocket, userID, proxy, chat = null){
         this.webSocket = webSocket;
         this.userID = userID;
         this.chat = chat;
+        this.proxy = proxy;
         this.recieveMessage = null;
         this.pingInterval = null;
         this.lastContact = now();
@@ -130,6 +157,20 @@ class user{
                 const msg = JSON.parse(message.toString());
                 if(msg?.type == TYPE_PONG){
                     renewLastContact();
+                }
+            }catch(e){
+                console.error("invalid JSON message", e);
+            }
+        });
+    }
+
+    setupProxyConnection(){
+        this.webSocket.on("message", (message, isBinary)=>{
+            if(isBinary){console.log("binary message recieved");return;}
+            try{
+                const msg = JSON.parse(message.toString());
+                if(msg?.type != TYPE_PONG){
+                    this.proxy.onMessage(this, msg);
                 }
             }catch(e){
                 console.error("invalid JSON message", e);
