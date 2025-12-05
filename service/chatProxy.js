@@ -14,27 +14,31 @@ export default class chatProxy{
         this.server = httpServer;
         this.authHandler = authHandler;
         this.dbConnection = dbConnection;
-        this.wss = new WebSocketServer(this.server);
+        this.wss = new WebSocketServer({noServer:true});
         this.chats = {};
         this.users = {};
         this.userTimeoutInterval = null;
         
-        proxySetup();
+        this.proxySetup();
     }
     proxySetup(){
         
         this.server.on("upgrade", async (req, socket, head)=>{
-            let cookies = req.headers.cookie || "";
-            cookies = cookie.parse(cookie);
-            const userID = "";
-
+            let cookies = req.headers.cookie ?? "";
+            cookies = cookie.parse(cookies);
+            let clientData = {};
+            
             if(TOKEN_NAME in cookies){
-                if(!this.authHandler.verifySessionToken(TOKEN_NAME)){
+                const tkn = cookies[TOKEN_NAME];
+                if(!this.authHandler.verifySessionToken(tkn)){
                     socket.destroy();
                     return;
                 }
-                const client = await this.authHandler.getUserWithToken(TOKEN_NAME);
-
+                clientData = await this.authHandler.getUserWithToken(tkn);
+                if(!client){
+                    socket.destroy();
+                    return;
+                }
 
             }else if(GUEST_TOKEN_NAME in cookies){
 
@@ -45,12 +49,17 @@ export default class chatProxy{
             }
 
 
-            this.wss.handleUpgrade(req, socket, head,()=>{
-                wss.emit("connection", ws, req);
+            this.wss.handleUpgrade(req, socket, head,(ws)=>{
+                this.wss.emit("connection", ws, req, clientData);
             });
         })
 
-        setupCheckTimeOut();
+        this.wss.on("connection", (ws, req, clientData)=>{
+            const userClient = new User(ws,clientData,this);
+            this.users[clientData.userID] = userClient;
+        });
+
+        this.setupCheckTimeOut();
     }
 
     setupCheckTimeOut(){
@@ -68,37 +77,36 @@ export default class chatProxy{
         },10*1000);
     }
 
-    async changeCurrentUserChat(u, chatID){
+    async changeCurrentUserChat(user, chatID){
+        if(chatID == null) return;
         const chat = await this.dbConnection.getChatWithID(chatID);
         if(!chat) return;
 
-        const idx = chat.users.indexOf(u.username);
+        const idx = chat.users.indexOf(user.username);
         if(idx == -1){return;}// not apart of the chat
-        
-        if(chatID!= null){
-            this.chats[chatID].addUser(u);
-            u.setNewChat(this.chats[chatID]);
-        }
-        else{
+
+        if(this.chats[chatID]){
+            this.chats[chatID].addUser(user);
+            user.setNewChat(this.chats[chatID]);
+        }else{
             const c = new chatRoom(chat, this);
-            c.addUser(u);
-            u.setNewChat(c);
+            c.addUser(user);
+            user.setNewChat(c);
             this.chats[chat.chatID] = c;
         }
     }
 
-    onMessage(u, message){
-        const type = message?.type | "";
+    onMessage(user, message){
+        const type = message?.type ?? "";
         switch(type){
             case TYPE_MESSAGE:
                 break;
             case TYPE_CONNECT_TO_CHAT:
-                this.changeCurrentUserChat(u, message.chatID);
+                this.changeCurrentUserChat(user, message.chatID);
                 break;
             case TYPE_DISCONNECT:
-                u.close();
-                const rmIdx2 =this.users.indexOf(sender);
-                if(rmIdx2!=-1) this.users.splice(rmIdx2,1);
+                user.close();
+                delete this.users[user.userData.userID];
                 break;
             default:
                 console.log("Unknown Message Type");
@@ -112,13 +120,13 @@ class chatRoom {
     constructor(chatData, proxy){
         this.chatData = chatData;
         this.proxy = proxy;
-        this.users = [];    
+        this.chatUsers = [];    
     }
 
     sendMessageToOthers(sender, message){
-        for(u in this.users){
-            if(u != sender && !u.closed){
-                u.sendMessage(message);
+        for(const user of this.chatUsers){
+            if(user != sender && !user.closed){
+                user.sendMessage(message);
             }
         }
     }
@@ -130,13 +138,13 @@ class chatRoom {
                 this.sendMessageToOthers(sender,message);
                 break;
             case TYPE_CONNECT_TO_CHAT:
-                const rmIdx =this.users.indexOf(sender);
-                if(rmIdx!=-1) this.users.splice(rmIdx,1);
+                const rmIdx =this.chatUsers.indexOf(sender);
+                if(rmIdx!=-1) this.chatUsers.splice(rmIdx,1);
                 break;
             case TYPE_DISCONNECT:
                 sender.close();
-                const rmIdx2 =this.users.indexOf(sender);
-                if(rmIdx2!=-1) this.users.splice(rmIdx2,1);
+                const rmIdx2 =this.chatUsers.indexOf(sender);
+                if(rmIdx2!=-1) this.chatUsers.splice(rmIdx2,1);
                 break;
             default:
                 console.log("Unknown Message Type");
@@ -146,15 +154,15 @@ class chatRoom {
 
 
     addUser(u){
-        this.users.push(u);
+        this.chatUsers.push(u);
     }
 
 }
 
 TIME_OUT = 60; //seconds
-class user{
+class User{
 
-    PING_MESSAGE = `{"type":"${TYPE_PING}"}`;
+    static PING_MESSAGE = `{"type":"${TYPE_PING}"}`;
 
     constructor(webSocket, userData, proxy, chat = null){
         this.webSocket = webSocket;
@@ -166,23 +174,23 @@ class user{
         this.lastContact = now();
         this.closed = false;
         if(chat!=null){
-            addHook();
+            this.addHook();
         }
-        setupPingPong();
+        this.setupPingPong();
     }
 
     setupPingPong(){
         this.renewLastContact();
 
         this.pingInterval = setInterval(()=>{
-            this.webSocket.send(user.PING_MESSAGE);
+            this.webSocket.send(User.PING_MESSAGE);
         }, 10 * 1000);
 
         this.webSocket.on("message",async (message, isBinary)=>{
             try{
                 const msg = JSON.parse(message.toString());
                 if(msg?.type == TYPE_PONG){
-                    renewLastContact();
+                    this.renewLastContact();
                 }
             }catch(e){
                 console.error("invalid JSON message", e);
@@ -209,7 +217,7 @@ class user{
     }
 
     isTimedOut(){
-        return this.lastContact - now() > TIME_OUT;
+        return now() - this.lastContact > TIME_OUT;
     }
 
     setNewChat(chat){
@@ -244,7 +252,7 @@ class user{
     }
 
     close(){
-        removeHook();
+        this.removeHook();
         clearInterval(this.pingInterval);
         this.webSocket.close();
         this.closed = true;
