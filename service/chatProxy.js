@@ -68,13 +68,40 @@ export default class chatProxy{
         },10*1000);
     }
 
-    changeCurrentUserChat(u, chatID){
-        if(chatID!= null)
+    async changeCurrentUserChat(u, chatID){
+        const chat = await this.dbConnection.getChatWithID(chatID);
+        if(!chat) return;
+
+        const idx = chat.users.indexOf(u.username);
+        if(idx == -1){return;}// not apart of the chat
+        
+        if(chatID!= null){
             this.chats[chatID].addUser(u);
+            u.setNewChat(this.chats[chatID]);
+        }
         else{
-            const c = new chatRoom(chatID, this);
+            const c = new chatRoom(chat, this);
             c.addUser(u);
-            this.chats[chatID] = c;
+            u.setNewChat(c);
+            this.chats[chat.chatID] = c;
+        }
+    }
+
+    onMessage(u, message){
+        const type = message?.type | "";
+        switch(type){
+            case TYPE_MESSAGE:
+                break;
+            case TYPE_CONNECT_TO_CHAT:
+                this.changeCurrentUserChat(u, message.chatID);
+                break;
+            case TYPE_DISCONNECT:
+                u.close();
+                const rmIdx2 =this.users.indexOf(sender);
+                if(rmIdx2!=-1) this.users.splice(rmIdx2,1);
+                break;
+            default:
+                console.log("Unknown Message Type");
         }
     }
 
@@ -82,15 +109,15 @@ export default class chatProxy{
 
 class chatRoom {
 
-    constructor(chatID, proxy){
-        this.chatID = chatID;
+    constructor(chatData, proxy){
+        this.chatData = chatData;
         this.proxy = proxy;
         this.users = [];    
     }
 
     sendMessageToOthers(sender, message){
         for(u in this.users){
-            if(u != sender){
+            if(u != sender && !u.closed){
                 u.sendMessage(message);
             }
         }
@@ -105,7 +132,6 @@ class chatRoom {
             case TYPE_CONNECT_TO_CHAT:
                 const rmIdx =this.users.indexOf(sender);
                 if(rmIdx!=-1) this.users.splice(rmIdx,1);
-                this.proxy.changeCurrentUserChat(sender, message.chatID);
                 break;
             case TYPE_DISCONNECT:
                 sender.close();
@@ -130,9 +156,9 @@ class user{
 
     PING_MESSAGE = `{"type":"${TYPE_PING}"}`;
 
-    constructor(webSocket, userID, proxy, chat = null){
+    constructor(webSocket, userData, proxy, chat = null){
         this.webSocket = webSocket;
-        this.userID = userID;
+        this.userData = userData;
         this.chat = chat;
         this.proxy = proxy;
         this.recieveMessage = null;
