@@ -136,9 +136,9 @@ class chatRoom {
     sendMessageToOthers(sender, message){
         for(const user of this.chatUsers){
             console.log("message to others: " + JSON.stringify(message)); 
-           // if(user != sender && !user.closed){
+            if(user != sender && !user.closed){
                 user.sendMessage(message);
-            //}
+            }
         }
     }
 
