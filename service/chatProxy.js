@@ -166,7 +166,7 @@ class chatRoom {
 
 }
 
-TIME_OUT = 60; //seconds
+const TIME_OUT = 60; //seconds
 class User{
 
     static PING_MESSAGE = `{"type":"${TYPE_PING}"}`;
