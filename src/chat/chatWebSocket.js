@@ -12,7 +12,7 @@ class chatWebSocket{
         
         let port = window.location.port;
         const protocol = window.location.protocol === 'http:' ? 'ws' : 'wss';
-        const loc = `${protocol}://${window.location.hostname}:${3000}`;
+        const loc = `${protocol}://${window.location.hostname}:${port}`;
         this.connected = "unknown";
         this.handlers = [];
         this.addPingHandler();
