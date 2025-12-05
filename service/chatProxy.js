@@ -1,5 +1,6 @@
 import {WebSocketServer} from "ws";
 import cookie from "cookie";
+import {TOKEN_NAME, GUEST_TOKEN_NAME} from "./consts.js";
 
 const TYPE_MESSAGE = "message";
 const TYPE_CONNECT_TO_CHAT = "connect"
@@ -35,13 +36,19 @@ export default class chatProxy{
                     return;
                 }
                 clientData = await this.authHandler.getUserWithToken(tkn);
-                if(!client){
+                if(!clientData){
                     socket.destroy();
                     return;
                 }
 
             }else if(GUEST_TOKEN_NAME in cookies){
-
+                const tkn = cookies[GUEST_TOKEN_NAME];
+                if(!this.authHandler.verifyGuestToken(tkn)){
+                    socket.destroy();
+                    return;
+                }
+                const nm = this.authHandler.getGuestName(tkn);
+                clientData = {userID:nm, username:nm};
 
             }else{
                 socket.destroy();
@@ -132,7 +139,7 @@ class chatRoom {
     }
 
     onMessage(sender, message){
-        const type = message?.type | "";
+        const type = message?.type ?? "";
         switch(type){
             case TYPE_MESSAGE:
                 this.sendMessageToOthers(sender,message);
@@ -177,6 +184,7 @@ class User{
             this.addHook();
         }
         this.setupPingPong();
+        this.setupProxyConnection();
     }
 
     setupPingPong(){
@@ -196,6 +204,7 @@ class User{
                 console.error("invalid JSON message", e);
             }
         });
+        this.webSocket.on("close", () => clearInterval(this.pingInterval));
     }
 
     setupProxyConnection(){
