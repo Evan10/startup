@@ -6,6 +6,7 @@ import { Message } from './message';
 import { DogImageMessage } from "./DogImageMessage"
 import messageState from "./messageState"
 import { useParams,useNavigate } from 'react-router-dom';
+import {getChatWebSocket, TYPE_CONNECT_TO_CHAT, TYPE_MESSAGE} from "./chatWebSocket";
 
 export function Chat({ user, chatId }) {
   const [messages, updateMessages] = useState([]);
@@ -13,11 +14,27 @@ export function Chat({ user, chatId }) {
   const [joinCode, updateJoinCode] = useState("");
   const {chatID} = useParams();
   const navigate = useNavigate();
-
+  const cws = getChatWebSocket();
   const endOfSectionRef = useRef(null);
 
+
+  useEffect(() => {
+    cws.addHandler((msg)=>{
+      if(msg?.type == TYPE_MESSAGE){
+        const data = msg?.data;
+        updateMessages((msgs) => {
+          return [...msgs, data]
+        });
+      }
+    })
+   },[]);
+
   useEffect(() => { 
-    console.log(chatID)
+    console.log(chatID);
+
+    const wsMessage = {"type":TYPE_CONNECT_TO_CHAT, "chatID":chatID};
+    cws.sendMessage(wsMessage);
+
     fetch(`/api/chat/getChat?chatID=${chatID}&isGuest=${!user}`,{
         method:'GET',
         headers: { 'Content-Type': 'application/json' }}) 
@@ -42,6 +59,10 @@ export function Chat({ user, chatId }) {
 
   const sendMessage = (msg) => {
     const messageData = {type:"text",content:msg, user: user, state:messageState.Sending, id:crypto.randomUUID()}
+
+    const wsMessage = {type:TYPE_MESSAGE, "data":messageData};
+    cws.sendMessage(wsMessage);
+
     updateMessages((msgs) => {
         return [...msgs, messageData]
       });
@@ -60,7 +81,10 @@ export function Chat({ user, chatId }) {
 
 
     const messageData = {type:"image",content:res.message, user: user, state:messageState.Sending, id:crypto.randomUUID()}
-    
+
+    const wsMessage = {type:TYPE_MESSAGE, "data":messageData};
+    cws.sendMessage(wsMessage);
+
     updateMessages((msgs) => {
       return [...msgs, messageData]
     });

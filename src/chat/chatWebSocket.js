@@ -1,9 +1,9 @@
 
-const TYPE_MESSAGE = "message";
-const TYPE_CONNECT_TO_CHAT = "connect"
-const TYPE_DISCONNECT = "disconnect";
-const TYPE_PING = "ping";
-const TYPE_PONG = "pong";
+export const TYPE_MESSAGE = "message";
+export const TYPE_CONNECT_TO_CHAT = "connect"
+export const TYPE_DISCONNECT = "disconnect";
+export const TYPE_PING = "ping";
+export const TYPE_PONG = "pong";
 
 class chatWebSocket{
     
