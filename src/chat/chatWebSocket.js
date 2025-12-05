@@ -12,6 +12,7 @@ class chatWebSocket{
         let port = window.location.port;
         const protocol = window.location.protocol === 'http:' ? 'ws' : 'wss';
         const loc = `${protocol}://${window.location.hostname}:${port}`
+        this.connected = "unknown";
         this.handlers = [];
         this.addPingHandler();
         this.socket = WebSocket(loc);
@@ -21,6 +22,10 @@ class chatWebSocket{
                 handler(message);
             }
         };
+        this.socket.onopen = ()=>{this.connected = "connected";};
+        this.socket.onclose = ()=>{this.connected = "not connected";};
+        this.socket.onerror = ()=>{this.connected = "not connected";};
+        
         
     }
     addPingHandler(){
@@ -43,13 +48,16 @@ class chatWebSocket{
         this.socket.send(JSON.stringify(message));
     }
 
+    isRunning(){
+        return this.connected == "connected";
+    }
 }
 
 
-const csw = new chatWebSocket();
-export default getChatWebSocket(){
-    if(csw == null){
+let csw;
+export default function getChatWebSocket(){
+    if(csw == null || !csw.isRunning()){
         csw = new chatWebSocket();
     }
-    return csw
-}
+    return csw;
+};
