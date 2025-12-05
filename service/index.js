@@ -109,7 +109,7 @@ APIRouter.post("/auth/login", async (req, res)=>{
 
 APIRouter.delete("/auth/logout", (req, res)=>{
     const userToken = req.cookies[TOKEN_NAME];
-    if(!userToken)res.status(401).send({message:"Couldn't find user."});
+    if(!userToken){res.status(401).send({message:"Couldn't find user."});return;}
 
     myAuthVerifier.endSession(userToken);
     res.status(200).clearCookie(TOKEN_NAME).send({message:"User successfully signed out"});

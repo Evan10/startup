@@ -25,8 +25,10 @@ export default class chatProxy{
     proxySetup(){
         
         this.server.on("upgrade", async (req, socket, head)=>{
+
             let cookies = req.headers.cookie ?? "";
             cookies = cookie.parse(cookies);
+            
             let clientData = {};
             
             if(TOKEN_NAME in cookies){
@@ -89,7 +91,7 @@ export default class chatProxy{
         const chat = await this.dbConnection.getChatWithID(chatID);
         if(!chat) return;
 
-        const idx = chat.users.indexOf(user.username);
+        const idx = chat.users.indexOf(user.userData.username);
         if(idx == -1){return;}// not apart of the chat
 
         if(this.chats[chatID]){
@@ -104,6 +106,7 @@ export default class chatProxy{
     }
 
     onMessage(user, message){
+        console.log(JSON.stringify(message));
         const type = message?.type ?? "";
         switch(type){
             case TYPE_MESSAGE:
@@ -132,9 +135,10 @@ class chatRoom {
 
     sendMessageToOthers(sender, message){
         for(const user of this.chatUsers){
-            if(user != sender && !user.closed){
+            console.log("message to others: " + JSON.stringify(message)); 
+           // if(user != sender && !user.closed){
                 user.sendMessage(message);
-            }
+            //}
         }
     }
 
@@ -199,6 +203,7 @@ class User{
                 const msg = JSON.parse(message.toString());
                 if(msg?.type == TYPE_PONG){
                     this.renewLastContact();
+                    console.log("Pong recieved")
                 }
             }catch(e){
                 console.error("invalid JSON message", e);
@@ -253,6 +258,7 @@ class User{
     }
 
     removeHook(){
+        if(!this.recieveMessage) return;
         this.webSocket.off("message", this.recieveMessage);
     }
 

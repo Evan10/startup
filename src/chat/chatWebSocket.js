@@ -9,20 +9,26 @@ class chatWebSocket{
     
 
     constructor(){
+        
         let port = window.location.port;
         const protocol = window.location.protocol === 'http:' ? 'ws' : 'wss';
-        const loc = `${protocol}://${window.location.hostname}:${port}`
+        const loc = `${protocol}://${window.location.hostname}:${3000}`;
         this.connected = "unknown";
         this.handlers = [];
         this.addPingHandler();
-        this.socket = WebSocket(loc);
-        this.socket.onmessage = async (msg) => {
-            const message = JSON.parse(await msg.data.text());
+        this.socket = new WebSocket(loc);
+        this.socket.onmessage = (msg) => {
+            const message = JSON.parse(msg.data);
             for(const handler of this.handlers){
                 handler(message);
             }
         };
-        this.socket.onopen = ()=>{this.connected = "connected";};
+        this.preconnectMessageQueue = [];
+        this.socket.onopen = ()=>{this.connected = "connected";
+            for(const m of this.preconnectMessageQueue){
+                this.sendMessage(m);
+            }
+        };
         this.socket.onclose = ()=>{this.connected = "not connected";};
         this.socket.onerror = ()=>{this.connected = "not connected";};
         
@@ -31,7 +37,8 @@ class chatWebSocket{
     addPingHandler(){
         this.addHandler((msg)=>{
             if(msg?.type == TYPE_PING){
-                this.sendMessage(`{"type":${TYPE_PONG}}`);
+                this.sendMessage({"type":TYPE_PONG});
+                console.log("ping");
             }
         });
     }
@@ -45,17 +52,18 @@ class chatWebSocket{
     }
 
     sendMessage(message){
+        if(!this.isRunning()){ this.preconnectMessageQueue.push(message);return;}
         this.socket.send(JSON.stringify(message));
     }
 
     isRunning(){
-        return this.connected == "connected";
+        return this.connected === "connected";
     }
 }
 
 
 let csw;
-export default function getChatWebSocket(){
+export function getChatWebSocket(){
     if(csw == null || !csw.isRunning()){
         csw = new chatWebSocket();
     }

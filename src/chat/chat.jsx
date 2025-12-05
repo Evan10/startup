@@ -14,7 +14,7 @@ export function Chat({ user, chatId }) {
   const [joinCode, updateJoinCode] = useState("");
   const {chatID} = useParams();
   const navigate = useNavigate();
-  const cws = getChatWebSocket();
+  let cws = getChatWebSocket();
   const endOfSectionRef = useRef(null);
 
 
