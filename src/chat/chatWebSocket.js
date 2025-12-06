@@ -9,31 +9,14 @@ class chatWebSocket{
     
 
     constructor(){
-        
-        let port = window.location.port;
-        const protocol = window.location.protocol === 'http:' ? 'ws' : 'wss';
-        const loc = `${protocol}://${window.location.hostname}:${port}`;
         this.connected = "unknown";
         this.handlers = [];
         this.addPingHandler();
-        this.socket = new WebSocket(loc);
-        this.socket.onmessage = (msg) => {
-            const message = JSON.parse(msg.data);
-            for(const handler of this.handlers){
-                handler(message);
-            }
-        };
         this.preconnectMessageQueue = [];
-        this.socket.onopen = ()=>{this.connected = "connected";
-            for(const m of this.preconnectMessageQueue){
-                this.sendMessage(m);
-            }
-        };
-        this.socket.onclose = ()=>{this.connected = "not connected";};
-        this.socket.onerror = ()=>{this.connected = "not connected";};
-        
-        
+        this.socket = null;
+        this.connect();
     }
+
     addPingHandler(){
         this.addHandler((msg)=>{
             if(msg?.type == TYPE_PING){
@@ -59,13 +42,40 @@ class chatWebSocket{
     isRunning(){
         return this.connected === "connected";
     }
+
+    connect(){
+        let port = window.location.port;
+        const protocol = window.location.protocol === 'http:' ? 'ws' : 'wss';
+        const loc = `${protocol}://${window.location.hostname}:${port}`;
+        this.connected = "unknown";
+        if(this.socket!=null){
+            this.socket.close();
+        }
+        this.socket = new WebSocket(loc);
+        this.socket.onmessage = (msg) => {
+            const message = JSON.parse(msg.data);
+            for(const handler of this.handlers){
+                handler(message);
+            }
+        };
+        
+        this.socket.onopen = ()=>{this.connected = "connected";
+            for(const m of this.preconnectMessageQueue){
+                this.sendMessage(m);
+            }
+        };
+        this.socket.onclose = ()=>{this.connected = "not connected";};
+        this.socket.onerror = ()=>{this.connected = "not connected";};
+    }
 }
 
 
 let csw;
 export function getChatWebSocket(){
-    if(csw == null || !csw.isRunning()){
+    if(csw == null){
         csw = new chatWebSocket();
+    }else if(!csw.isRunning()){
+        csw.connect();
     }
     return csw;
 };
