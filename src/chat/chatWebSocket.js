@@ -10,7 +10,7 @@ class chatWebSocket{
 
     constructor(){
         
-        let port = 3000//window.location.port;
+        let port = window.location.port;
         const protocol = window.location.protocol === 'http:' ? 'ws' : 'wss';
         const loc = `${protocol}://${window.location.hostname}:${port}`;
         this.connected = "unknown";
