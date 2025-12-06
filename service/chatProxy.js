@@ -26,12 +26,16 @@ export default class chatProxy{
         
         this.server.on("upgrade", async (req, socket, head)=>{
 
+            console.log("user upgrading to socket");
+
             let cookies = req.headers.cookie ?? "";
             cookies = cookie.parse(cookies);
             
             let clientData = {};
             
             if(TOKEN_NAME in cookies){
+                console.log("They are a user");
+
                 const tkn = cookies[TOKEN_NAME];
                 if(!this.authHandler.verifySessionToken(tkn)){
                     socket.destroy();
@@ -44,6 +48,8 @@ export default class chatProxy{
                 }
 
             }else if(GUEST_TOKEN_NAME in cookies){
+                console.log("They are a guest");
+
                 const tkn = cookies[GUEST_TOKEN_NAME];
                 if(!this.authHandler.verifyGuestToken(tkn)){
                     socket.destroy();
@@ -64,6 +70,8 @@ export default class chatProxy{
         })
 
         this.wss.on("connection", (ws, req, clientData)=>{
+            console.log("User Added");
+
             const userClient = new User(ws,clientData,this);
             this.users[clientData.userID] = userClient;
         });
@@ -87,12 +95,16 @@ export default class chatProxy{
     }
 
     async changeCurrentUserChat(user, chatID){
+        if(user?.chat){
+            user.chat.removeUser(user);
+        }
+
         if(chatID == null) return;
         const chat = await this.dbConnection.getChatWithID(chatID);
         if(!chat) return;
 
-        const idx = chat.users.indexOf(user.userData.username);
-        if(idx == -1){return;}// not apart of the chat
+        const userInChat = chat.users.includes(user.userData.username);
+        if(!userInChat){return;}
 
         if(this.chats[chatID]){
             this.chats[chatID].addUser(user);
@@ -134,8 +146,9 @@ class chatRoom {
     }
 
     sendMessageToOthers(sender, message){
+        console.log("message to others: " + JSON.stringify(message)); 
         for(const user of this.chatUsers){
-            console.log("message to others: " + JSON.stringify(message)); 
+            
             if(user != sender && !user.closed){
                 user.sendMessage(message);
             }
@@ -149,8 +162,6 @@ class chatRoom {
                 this.sendMessageToOthers(sender,message);
                 break;
             case TYPE_CONNECT_TO_CHAT:
-                const rmIdx =this.chatUsers.indexOf(sender);
-                if(rmIdx!=-1) this.chatUsers.splice(rmIdx,1);
                 break;
             case TYPE_DISCONNECT:
                 sender.close();
@@ -165,9 +176,16 @@ class chatRoom {
 
 
     addUser(u){
+        console.log("User added to chat");
         this.chatUsers.push(u);
+         console.log(`there are now ${this.chatUsers.length} users in this chat`)
     }
 
+    removeUser(u){
+        console.log("user left chat");
+        this.chatUsers.splice(this.chatUsers.indexOf(u),1);
+        console.log(`there are now ${this.chatUsers.length} users in this chat`);
+    }
 }
 
 const TIME_OUT = 60; //seconds
@@ -180,15 +198,18 @@ class User{
         this.userData = userData;
         this.chat = chat;
         this.proxy = proxy;
-        this.recieveMessage = null;
         this.pingInterval = null;
         this.lastContact = now();
         this.closed = false;
-        if(chat!=null){
-            this.addHook();
-        }
         this.setupPingPong();
-        this.setupProxyConnection();
+        this.webSocket.on("message", (msg)=>{
+            try{
+                const message = JSON.parse(msg.toString());
+                this.onMessage(message);
+            }catch(e){
+                console.log("Error", e);
+            }
+        });
     }
 
     setupPingPong(){
@@ -198,32 +219,8 @@ class User{
             this.webSocket.send(User.PING_MESSAGE);
         }, 10 * 1000);
 
-        this.webSocket.on("message",async (message, isBinary)=>{
-            try{
-                const msg = JSON.parse(message.toString());
-                if(msg?.type == TYPE_PONG){
-                    this.renewLastContact();
-                    console.log("Pong recieved")
-                }
-            }catch(e){
-                console.error("invalid JSON message", e);
-            }
-        });
-        this.webSocket.on("close", () => clearInterval(this.pingInterval));
-    }
 
-    setupProxyConnection(){
-        this.webSocket.on("message", (message, isBinary)=>{
-            if(isBinary){console.log("binary message recieved");return;}
-            try{
-                const msg = JSON.parse(message.toString());
-                if(msg?.type != TYPE_PONG){
-                    this.proxy.onMessage(this, msg);
-                }
-            }catch(e){
-                console.error("invalid JSON message", e);
-            }
-        });
+        this.webSocket.on("close", () => clearInterval(this.pingInterval));
     }
 
     renewLastContact(){
@@ -235,36 +232,44 @@ class User{
     }
 
     setNewChat(chat){
-        this.removeHook();
         this.chat = chat;
-        this.addHook();
     }
 
-    addHook(){
-        this.recieveMessage = (message, isBinary) => {
-            if(isBinary){console.log("binary message recieved");return;}
-            try{
-                const msg = JSON.parse(message.toString());
-                if(msg?.type != TYPE_PONG){
-                    this.chat.onMessage(this, msg);
-                }
-            }catch(e){
-                console.error("invalid JSON message", e);
-            }
-            
-        };
-
-        this.webSocket.on("message", this.recieveMessage);
-    }
-
-    removeHook(){
-        if(!this.recieveMessage) return;
-        this.webSocket.off("message", this.recieveMessage);
-    }
 
     sendMessage(message){
         this.webSocket.send(JSON.stringify(message));
     }
+
+    onMessage(msg){
+        const type = msg?.type ?? "";
+        switch(type){
+            case TYPE_PONG:
+                this.renewLastContact();
+                break;
+            case TYPE_MESSAGE:
+                this.proxy.onMessage(this, msg);
+                if(this.chat != null){
+                    this.chat.onMessage(this, msg);
+                }
+                break;
+            case TYPE_CONNECT_TO_CHAT:
+                this.proxy.onMessage(this, msg);
+                if(this.chat != null){
+                    this.chat.onMessage(this, msg);
+                }
+                break;
+            case TYPE_DISCONNECT:
+                this.proxy.onMessage(this, msg);
+                if(this.chat != null){
+                    this.chat.onMessage(this, msg);
+                }
+                break;
+            default:
+                console.log("Unknown Message Type");
+        }
+
+    }
+
 
     close(){
         this.removeHook();

@@ -145,6 +145,7 @@ APIRouter.patch("/chat/JoinChat", async (req, res)=>{
         await myDatabase.addGuestUserToChat(username,chat.chatID);
     }else{
         const user = await myAuthVerifier.getUserWithToken(userToken);
+        if(!user){res.status(401).clearCookie(TOKEN_NAME).end();return;}
         await myDatabase.addUsertoChat(user.username,chat.chatID);
     }
     
